@@ -5,3 +5,4 @@ npm i -D eslint @rocketseat/eslint-config
 
 
 nest g module player
+nest g controller player
