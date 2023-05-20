@@ -1,17 +1,13 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { SavePlayerDto } from './dtos/save-player.dto';
+import { Body, Controller, Post } from '@nestjs/common'
+import { SavePlayerDto } from './dtos/save-player.dto'
+import { PlayerService } from './player.service'
 
 @Controller('api/v1/player')
 export class PlayerController {
-  
+  constructor(private readonly playerService: PlayerService) {}
+
   @Post()
-  async savePlayer(
-    @Body() {name, email}: SavePlayerDto
-  ) {
-    
-    return JSON.stringify({
-      "name": name,
-      "email": email
-    })
+  async save(@Body() player: SavePlayerDto) {
+    return await this.playerService.save(player)
   }
 }
