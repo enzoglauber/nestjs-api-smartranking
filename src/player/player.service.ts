@@ -12,6 +12,10 @@ export class PlayerService {
     await this.insert(player)
   }
 
+  async get(): Promise<Player[]> {
+    return await this.players
+  }
+
   private insert(savePlayer: SavePlayerDto): void {
     const { name, email, phone } = savePlayer
     const player: Player = {

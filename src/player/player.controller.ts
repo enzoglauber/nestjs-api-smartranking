@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common'
 import { SavePlayerDto } from './dtos/save-player.dto'
+import { Player } from './player.interface'
 import { PlayerService } from './player.service'
 
 @Controller('api/v1/player')
@@ -12,7 +13,7 @@ export class PlayerController {
   }
 
   @Get()
-  async get(@Body() player: SavePlayerDto) {
-    return await this.playerService.save(player)
+  async get(): Promise<Player[]> {
+    return await this.playerService.get()
   }
 }
