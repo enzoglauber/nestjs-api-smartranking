@@ -7,3 +7,8 @@ npm i uuid
 nest g module player
 nest g controller player
 nest g service player
+
+
+npm install mongodb
+
+mongodb+srv://root:<password>@cluster0.qpxt5ib.mongodb.net/?retryWrites=true&w=majority
