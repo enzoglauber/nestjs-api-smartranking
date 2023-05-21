@@ -25,9 +25,9 @@ export class PlayerService {
 
   async find(email?: string): Promise<Player[]> {
     if (email) {
-      return await this.findByEmail(email)
+      return this.findByEmail(email)
     } else {
-      return await this.players
+      return this.players
     }
   }
 
