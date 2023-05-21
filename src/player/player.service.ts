@@ -19,12 +19,20 @@ export class PlayerService {
   }
 
   async find(email?: string): Promise<Player[]> {
-    return await this.players
+    if (email) {
+      return await this.findByEmail(email)
+    } else {
+      return await this.players
+    }
   }
 
   private update(find: Player, player: SavePlayerDto): void {
     const { name } = player
     find.name = name
+  }
+
+  private findByEmail(email: string): Player[] {
+    return this.players.filter((_player) => _player.email === email)
   }
 
   private insert(savePlayer: SavePlayerDto): void {
