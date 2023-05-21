@@ -13,7 +13,7 @@ export class PlayerController {
   }
 
   @Get()
-  async get(): Promise<Player[]> {
-    return await this.playerService.get()
+  async find(@Body() { email }: SavePlayerDto): Promise<Player[]> {
+    return await this.playerService.find(email)
   }
 }

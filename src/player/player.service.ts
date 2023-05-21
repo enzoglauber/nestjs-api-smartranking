@@ -9,11 +9,22 @@ export class PlayerService {
   private readonly logger = new Logger(PlayerService.name)
 
   async save(player: SavePlayerDto): Promise<void> {
-    await this.insert(player)
+    const { email } = player
+    const find = this.players.find((_player) => _player.email === email)
+    if (find) {
+      this.update(find, player)
+    } else {
+      this.insert(player)
+    }
   }
 
-  async get(): Promise<Player[]> {
+  async find(email?: string): Promise<Player[]> {
     return await this.players
+  }
+
+  private update(find: Player, player: SavePlayerDto): void {
+    const { name } = player
+    find.name = name
   }
 
   private insert(savePlayer: SavePlayerDto): void {
