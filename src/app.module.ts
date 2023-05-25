@@ -9,16 +9,16 @@ import { PlayerModule } from './player/player.module'
       isGlobal: true,
     }),
     MongooseModule.forRootAsync({
-      imports: [ConfigModule], 
+      imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
         console.log(configService.get('MONGODB_URI'))
-        return {uri: configService.get('MONGODB_URI')}
+        return { uri: configService.get('MONGODB_URI') }
       },
-      inject: [ConfigService], 
+      inject: [ConfigService],
     }),
     PlayerModule,
   ],
   controllers: [],
-  providers: []
+  providers: [],
 })
 export class AppModule {}
