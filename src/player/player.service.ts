@@ -1,4 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
+import { InjectModel } from '@nestjs/mongoose'
+import { Model } from 'mongoose'
 import { v4 as uuidv4 } from 'uuid'
 import { SavePlayerDto } from './dtos/save-player.dto'
 import { Player } from './player.interface'
@@ -8,9 +10,12 @@ export class PlayerService {
   private players: Player[] = []
   private readonly logger = new Logger(PlayerService.name)
 
+  constructor(@InjectModel('Player') private readonly player: Model<Player>) {}
+
   async save(player: SavePlayerDto): Promise<void> {
     const { email } = player
-    const find = this.players.find((_player) => _player.email === email)
+    // const find = this.players.find((_player) => _player.email === email)
+    const find = this.player.find({ email })
     if (find) {
       this.update(find, player)
     } else {

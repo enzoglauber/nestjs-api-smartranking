@@ -6,7 +6,7 @@ import { PlayerModule } from './player/player.module'
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true,
+      isGlobal: true
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -14,11 +14,11 @@ import { PlayerModule } from './player/player.module'
         console.log(configService.get('MONGODB_URI'))
         return { uri: configService.get('MONGODB_URI') }
       },
-      inject: [ConfigService],
+      inject: [ConfigService]
     }),
-    PlayerModule,
+    PlayerModule
   ],
   controllers: [],
-  providers: [],
+  providers: []
 })
 export class AppModule {}
