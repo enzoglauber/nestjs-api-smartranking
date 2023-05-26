@@ -15,7 +15,6 @@ export class PlayerService {
   async save(player: SavePlayerDto): Promise<void> {
     const { email } = player
     const find = await this.player.findOne({ email }).exec()
-
     if (find) {
       this.update(find, player)
     } else {
