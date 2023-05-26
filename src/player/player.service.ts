@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
+import { DeleteResult } from 'mongodb'
 import { Model } from 'mongoose'
-import { v4 as uuidv4 } from 'uuid'
 import { SavePlayerDto } from './dtos/save-player.dto'
 import { Player } from './player.interface'
 
@@ -12,32 +12,34 @@ export class PlayerService {
 
   constructor(@InjectModel('Player') private readonly player: Model<Player>) {}
 
-  async save(player: SavePlayerDto): Promise<void> {
+  async save(player: SavePlayerDto): Promise<Player> {
     const { email } = player
-    const find = await this.player.findOne({ email }).exec()
+    const find = await this.find(email)
+    this.logger.log(find)
+
     if (find) {
-      this.update(find, player)
+      return await this.update(player)
     } else {
-      this.insert(player)
+      const data = await this.insert(player)
+      this.logger.verbose(data)
+      return data
     }
   }
 
-  async remove(email?: string): Promise<void> {
-    const find = this.players.find((player) => player.email === email)
-    this.players = this.players.filter((player) => player.email !== find.email)
+  async remove(email?: string): Promise<DeleteResult> {
+    return await this.player.deleteOne({ email }).exec()
   }
 
-  async find(email?: string): Promise<Player[]> {
+  async find(email?: string): Promise<Player[] | Player> {
     if (email) {
-      return this.findByEmail(email)
+      return await this.player.findOne({ email }).exec()
     } else {
-      return this.players
+      return await this.player.find({}).exec()
     }
   }
 
-  private update(find: Player, player: SavePlayerDto): void {
-    const { name } = player
-    find.name = name
+  private async update({ _id, ...player }: SavePlayerDto): Promise<Player> {
+    return await this.player.findOneAndUpdate({ _id }, { $set: { ...player } }).exec()
   }
 
   private findByEmail(email: string): Player[] {
@@ -48,18 +50,8 @@ export class PlayerService {
     return filter
   }
 
-  private insert(savePlayer: SavePlayerDto): void {
-    const { name, email, phone } = savePlayer
-    const player: Player = {
-      _id: uuidv4(),
-      name,
-      email,
-      phone,
-      ranking: 'A',
-      position: 1,
-      photo: 'www.google.com.br/foto123.jpg'
-    }
-    this.logger.log(player)
-    this.players.push(player)
+  private async insert(player: SavePlayerDto): Promise<Player> {
+    const created = new this.player(player)
+    return await created.save()
   }
 }
