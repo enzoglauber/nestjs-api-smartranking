@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { DeleteResult } from 'mongodb'
 import { Model } from 'mongoose'
@@ -15,14 +15,11 @@ export class PlayerService {
   async save(player: SavePlayerDto): Promise<Player> {
     const { email } = player
     const find = await this.find(email)
-    this.logger.log(find)
 
     if (find) {
       return await this.update(player)
     } else {
-      const data = await this.insert(player)
-      this.logger.verbose(data)
-      return data
+      return await this.insert(player)
     }
   }
 
@@ -39,16 +36,18 @@ export class PlayerService {
   }
 
   private async update({ _id, ...player }: SavePlayerDto): Promise<Player> {
-    return await this.player.findOneAndUpdate({ _id }, { $set: { ...player } }).exec()
+    return await this.player
+      .findOneAndUpdate({ _id }, { $set: { ...player } }, { upsert: true })
+      .exec()
   }
 
-  private findByEmail(email: string): Player[] {
-    const filter = this.players.filter((_player) => _player.email === email)
-    if (!filter.length) {
-      throw new NotFoundException(`Email's player equal ${email}, not found!`)
-    }
-    return filter
-  }
+  // private findByEmail(email: string): Player[] {
+  //   const filter = this.players.filter((_player) => _player.email === email)
+  //   if (!filter.length) {
+  //     throw new NotFoundException(`Email's player equal ${email}, not found!`)
+  //   }
+  //   return filter
+  // }
 
   private async insert(player: SavePlayerDto): Promise<Player> {
     const created = new this.player(player)
