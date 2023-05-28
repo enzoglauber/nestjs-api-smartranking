@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Query,
+  UsePipes,
+  ValidationPipe
+} from '@nestjs/common'
 import { DeleteResult } from 'mongodb'
 import { SavePlayerDto } from './dtos/save-player.dto'
 import { Player } from './player.interface'
@@ -6,7 +15,9 @@ import { PlayerService } from './player.service'
 @Controller('api/v1/player')
 export class PlayerController {
   constructor(private readonly playerService: PlayerService) {}
+
   @Post()
+  @UsePipes(ValidationPipe)
   async save(@Body() player: SavePlayerDto) {
     return await this.playerService.save(player)
   }

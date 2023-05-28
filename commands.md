@@ -4,6 +4,7 @@ nest new nestjs-api-smartranking
 npm i -D eslint @rocketseat/eslint-config
 npm i uuid
 npm i @nestjs/mongoose mongoose
+npm i class-validator class-transformer
 
 nest g module player
 nest g controller player
