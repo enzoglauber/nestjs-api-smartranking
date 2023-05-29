@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common'
 import { DeleteResult } from 'mongodb'
 import { SavePlayerDto } from './dtos/save-player.dto'
+import { PlayerParamsPipe } from './pipes/player.params.pipe'
 import { Player } from './player.interface'
 import { PlayerService } from './player.service'
 @Controller('api/v1/player')
@@ -23,12 +24,12 @@ export class PlayerController {
   }
 
   @Get()
-  async find(@Query('email') email: string): Promise<Player[] | Player> {
+  async find(@Query('email', PlayerParamsPipe) email: string): Promise<Player[] | Player> {
     return await this.playerService.find(email)
   }
 
   @Delete()
-  async delete(@Query('email') email: string): Promise<DeleteResult> {
+  async delete(@Query('email', PlayerParamsPipe) email: string): Promise<DeleteResult> {
     return await this.playerService.remove(email)
   }
 }
