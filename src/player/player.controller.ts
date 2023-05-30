@@ -3,7 +3,9 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
   Post,
+  Put,
   Query,
   UsePipes,
   ValidationPipe
@@ -19,13 +21,24 @@ export class PlayerController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  async save(@Body() player: SavePlayerDto) {
+  async insert(@Body() player: SavePlayerDto) {
     return await this.playerService.save(player)
   }
 
+  @Put('/:_id')
+  @UsePipes(ValidationPipe)
+  async update(@Body() player: SavePlayerDto, @Param('_id', PlayerParamsPipe) _id: string) {
+    return await this.playerService.save({ ...player, _id })
+  }
+
   @Get()
-  async find(@Query('email', PlayerParamsPipe) email: string): Promise<Player[] | Player> {
-    return await this.playerService.find(email)
+  async find(): Promise<Player[] | Player> {
+    return await this.playerService.find()
+  }
+
+  @Get('/:_id')
+  async findById(@Param('_id', PlayerParamsPipe) _id: string): Promise<Player> {
+    return await this.playerService.findById(_id)
   }
 
   @Delete()

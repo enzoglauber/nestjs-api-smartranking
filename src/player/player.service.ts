@@ -35,19 +35,15 @@ export class PlayerService {
     }
   }
 
+  async findById(_id?: string): Promise<Player> {
+    return await this.player.findOne({ _id }).exec()
+  }
+
   private async update({ _id, ...player }: SavePlayerDto): Promise<Player> {
     return await this.player
       .findOneAndUpdate({ _id }, { $set: { ...player } }, { upsert: true })
       .exec()
   }
-
-  // private findByEmail(email: string): Player[] {
-  //   const filter = this.players.filter((_player) => _player.email === email)
-  //   if (!filter.length) {
-  //     throw new NotFoundException(`Email's player equal ${email}, not found!`)
-  //   }
-  //   return filter
-  // }
 
   private async insert(player: SavePlayerDto): Promise<Player> {
     const created = new this.player(player)
