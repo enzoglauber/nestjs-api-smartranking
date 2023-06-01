@@ -6,7 +6,6 @@ import {
   Param,
   Post,
   Put,
-  Query,
   UsePipes,
   ValidationPipe
 } from '@nestjs/common'
@@ -28,7 +27,7 @@ export class PlayerController {
   @Put('/:_id')
   @UsePipes(ValidationPipe)
   async update(@Body() player: SavePlayerDto, @Param('_id', PlayerParamsPipe) _id: string) {
-    return await this.playerService.save({ ...player, _id })
+    return await this.playerService.update({ ...player, _id })
   }
 
   @Get()
@@ -41,8 +40,8 @@ export class PlayerController {
     return await this.playerService.findById(_id)
   }
 
-  @Delete()
-  async delete(@Query('email', PlayerParamsPipe) email: string): Promise<DeleteResult> {
-    return await this.playerService.remove(email)
+  @Delete('/:_id')
+  async delete(@Param('_id', PlayerParamsPipe) _id: string): Promise<DeleteResult> {
+    return await this.playerService.remove(_id)
   }
 }
