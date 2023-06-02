@@ -21,7 +21,7 @@ export class PlayerController {
   @Post()
   @UsePipes(ValidationPipe)
   async insert(@Body() player: SavePlayerDto) {
-    return await this.playerService.save(player)
+    return await this.playerService.insert(player)
   }
 
   @Put('/:_id')

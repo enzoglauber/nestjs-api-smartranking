@@ -3,8 +3,7 @@ import mongoose from 'mongoose'
 export const PlayerSchema = new mongoose.Schema(
   {
     phone: {
-      type: String,
-      unique: true
+      type: String
     },
     email: {
       type: String,
