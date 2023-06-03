@@ -1,21 +1,28 @@
 import mongoose from 'mongoose'
 
-export const PlayerSchema = new mongoose.Schema(
+export const CategorySchema = new mongoose.Schema(
   {
-    phone: {
-      type: String
-    },
-    email: {
+    name: {
       type: String,
       unique: true
     },
-    name: String,
-    ranking: String,
-    position: Number,
-    photo: String
+    description: String,
+    events: [
+      {
+        name: String,
+        operation: String,
+        value: Number
+      }
+    ],
+    players: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Player'
+      }
+    ]
   },
   {
     timestamps: true,
-    collection: 'Player'
+    collection: 'Category'
   }
 )
