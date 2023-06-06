@@ -10,13 +10,28 @@ export class CategoryService {
 
   async insert(category: InsertCategoryDto): Promise<Category> {
     const { name } = category
-    const find = await this.category.findOne({ name }).exec()
+    const notFind = !(await this.exists({ name }))
+    if (notFind) {
+      const created = new this.category(category)
+      return await created.save()
+    }
+  }
+
+  async all(filter: Partial<InsertCategoryDto> = {}): Promise<Category[]> {
+    return await this.category.find(filter).exec()
+  }
+
+  async one(filter: Partial<InsertCategoryDto> = {}): Promise<Category> {
+    return await this.category.findOne(filter).exec()
+  }
+
+  private async exists(filter: Partial<InsertCategoryDto>) {
+    const find = await this.category.findOne(filter).exec()
 
     if (find) {
-      throw new BadRequestException(`category's name: ${name} already registered.`)
+      throw new BadRequestException(`Category ${filter.name} already registered.`)
+    } else {
+      return find
     }
-
-    const created = new this.category(category)
-    return await created.save()
   }
 }
