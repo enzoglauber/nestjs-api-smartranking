@@ -22,7 +22,12 @@ export class CategoryService {
   }
 
   async one(filter: Partial<InsertCategoryDto> = {}): Promise<Category> {
-    return await this.category.findOne(filter).exec()
+    const find = await this.category.findOne(filter).exec()
+    if (!find) {
+      throw new BadRequestException(`Category ${filter.name} not found.`)
+    } else {
+      return find
+    }
   }
 
   private async exists(filter: Partial<InsertCategoryDto>) {
