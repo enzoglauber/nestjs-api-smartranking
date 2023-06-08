@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Post, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Put, UsePipes, ValidationPipe } from '@nestjs/common'
+import { PlayerParamsPipe } from 'src/player/pipes/player.params.pipe'
 import { Category } from './category.interface'
 import { CategoryService } from './category.service'
 import { InsertCategoryDto } from './dtos/insert-category.dto'
@@ -19,7 +20,12 @@ export class CategoryController {
 
   @Get('/:name')
   async one(@Param('name') name: string): Promise<Category> {
-    return await this.categoryService.one({name})
+    return await this.categoryService.one({ name })
   }
 
+  @Put('/:_id')
+  @UsePipes(ValidationPipe)
+  async update(@Body() category: InsertCategoryDto, @Param('_id', PlayerParamsPipe) _id: string) {
+    return await this.categoryService.update({ ...category, _id })
+  }
 }
