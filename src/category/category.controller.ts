@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Param, Post, Put, UsePipes, ValidationPipe } from '@nestjs/common'
-import { PlayerParamsPipe } from 'src/player/pipes/player.params.pipe'
 import { Category } from './category.interface'
 import { CategoryService } from './category.service'
 import { InsertCategoryDto } from './dtos/insert-category.dto'
+import { UpdateCategoryDto } from './dtos/update-category.dto'
 @Controller('api/v1/category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
@@ -23,9 +23,15 @@ export class CategoryController {
     return await this.categoryService.one({ name })
   }
 
-  @Put('/:_id')
+  @Put('/:name')
   @UsePipes(ValidationPipe)
-  async update(@Body() category: InsertCategoryDto, @Param('_id', PlayerParamsPipe) _id: string) {
-    return await this.categoryService.update({ ...category, _id })
+  async update(@Body() category: UpdateCategoryDto, @Param('name') name: string) {
+    return await this.categoryService.update(name, category)
+  }
+
+  @Post('/:name/player/:idPlayer')
+  @UsePipes(ValidationPipe)
+  async addPlayer(@Body() category: UpdateCategoryDto, @Param('name') name: string) {
+    return await this.categoryService.update(name, category)
   }
 }
