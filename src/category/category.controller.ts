@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Param, Post, Put, UsePipes, ValidationPipe } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UsePipes,
+  ValidationPipe
+} from '@nestjs/common'
+import { DeleteResult } from 'mongodb'
 import { Category } from './category.interface'
 import { CategoryService } from './category.service'
 import { InsertCategoryDto } from './dtos/insert-category.dto'
@@ -33,5 +44,10 @@ export class CategoryController {
   @UsePipes(ValidationPipe)
   async addPlayer(@Body() category: UpdateCategoryDto, @Param('name') name: string) {
     return await this.categoryService.update(name, category)
+  }
+
+  @Delete('/:_id')
+  async delete(@Param('_id', UpdateCategoryDto) _id: string): Promise<DeleteResult> {
+    return await this.categoryService.remove(_id)
   }
 }
