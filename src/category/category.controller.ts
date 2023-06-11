@@ -41,9 +41,8 @@ export class CategoryController {
   }
 
   @Post('/:name/player/:idPlayer')
-  @UsePipes(ValidationPipe)
-  async addPlayer(@Body() category: UpdateCategoryDto, @Param('name') name: string) {
-    return await this.categoryService.update(name, category)
+  async addPlayer(@Param() { name }: Partial<UpdateCategoryDto & InsertCategoryDto>) {
+    return await this.categoryService.addPlayer(name)
   }
 
   @Delete('/:_id')

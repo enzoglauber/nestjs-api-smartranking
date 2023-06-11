@@ -18,6 +18,15 @@ export class CategoryService {
     }
   }
 
+  async addPlayer(name): Promise<void> {
+    const notFound = !(await this.category.findOne({ name }).exec())
+    if (notFound) {
+      throw new NotFoundException(`Category ${name} not found`)
+    }
+
+    await this.category.findOneAndUpdate({ name }, { $set: category }, { upsert: true }).exec()
+  }
+
   async update(name, category: UpdateCategoryDto): Promise<void> {
     const notFound = !(await this.category.findOne({ name }).exec())
     if (notFound) {
