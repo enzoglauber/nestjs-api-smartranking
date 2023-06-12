@@ -1,13 +1,17 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
+import { PlayerService } from 'src/player/player.service'
 import { Category } from './category.interface'
 import { InsertCategoryDto } from './dtos/insert-category.dto'
 import { UpdateCategoryDto } from './dtos/update-category.dto'
 
 @Injectable()
 export class CategoryService {
-  constructor(@InjectModel('Category') private readonly category: Model<Category>) {}
+  constructor(
+    @InjectModel('Category') private readonly category: Model<Category>,
+    private readonly playerService: PlayerService
+  ) {}
 
   async insert(category: InsertCategoryDto): Promise<Category> {
     const { name } = category
@@ -18,10 +22,46 @@ export class CategoryService {
     }
   }
 
-  async addPlayer(name): Promise<void> {
-    const notFound = !(await this.category.findOne({ name }).exec())
-    if (notFound) {
+  async atribuirCategoriaJogador(params: string[]): Promise<void> {
+    const name = params['name']
+    const idPlayer = params['idPlayer']
+
+    const categoriaEncontrada = await this.category.findOne({ name }).exec()
+    const jogadorJaCadastradoCategoria = await this.category
+      .find({ name })
+      .where('player')
+      .in(idPlayer)
+      .exec()
+
+    await this.playerService.findById(idPlayer)
+
+    if (!categoriaEncontrada) {
+      throw new BadRequestException(`Categoria ${name} não cadastrada!`)
+    }
+
+    if (jogadorJaCadastradoCategoria.length > 0) {
+      throw new BadRequestException(`Jogador ${idPlayer} já cadastrado na Categoria ${name}!`)
+    }
+
+    categoriaEncontrada.players.push(idPlayer)
+    await this.category.findOneAndUpdate({ name }, { $set: categoriaEncontrada }).exec()
+  }
+
+  async addPlayer(name: string, idPlayer: any): Promise<void> {
+    const category = await this.category.findOne({ name }).exec()
+    if (!category) {
       throw new NotFoundException(`Category ${name} not found`)
+    }
+
+    const jogadorJaCadastradoCategoria = await this.category
+      .find({ name })
+      .where('player')
+      .in(idPlayer)
+      .exec()
+
+    const player = await this.playerService.findById(idPlayer)
+    if (player) {
+      category.players.push(player)
     }
 
     await this.category.findOneAndUpdate({ name }, { $set: category }, { upsert: true }).exec()
@@ -37,7 +77,7 @@ export class CategoryService {
   }
 
   async all(filter: Partial<InsertCategoryDto> = {}): Promise<Category[]> {
-    return await this.category.find(filter).exec()
+    return await this.category.find(filter).populate('player').exec()
   }
 
   async one(filter: Partial<InsertCategoryDto> = {}): Promise<Category> {
