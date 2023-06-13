@@ -29,7 +29,7 @@ export class CategoryService {
     const categoriaEncontrada = await this.category.findOne({ name }).exec()
     const jogadorJaCadastradoCategoria = await this.category
       .find({ name })
-      .where('player')
+      .where('Player')
       .in(idPlayer)
       .exec()
 
@@ -53,17 +53,22 @@ export class CategoryService {
       throw new NotFoundException(`Category ${name} not found`)
     }
 
-    const jogadorJaCadastradoCategoria = await this.category
+    const playerWithCategory = await this.category
       .find({ name })
-      .where('player')
-      .in(idPlayer)
+      .where('Player')
+      .in([idPlayer])
       .exec()
-
-    const player = await this.playerService.findById(idPlayer)
-    if (player) {
-      category.players.push(player)
+      
+    if (playerWithCategory.length > 0) {
+      throw new BadRequestException(`Player ${idPlayer} already registered at category ${name}!`)
     }
 
+    // const player = await this.playerService.findById(idPlayer)
+    // if (player) {
+    //   category.players.push(player)
+    // }
+    
+    category.players.push(idPlayer)
     await this.category.findOneAndUpdate({ name }, { $set: category }, { upsert: true }).exec()
   }
 
@@ -77,7 +82,7 @@ export class CategoryService {
   }
 
   async all(filter: Partial<InsertCategoryDto> = {}): Promise<Category[]> {
-    return await this.category.find(filter).populate('player').exec()
+    return await this.category.find(filter).populate('Player').exec()
   }
 
   async one(filter: Partial<InsertCategoryDto> = {}): Promise<Category> {
