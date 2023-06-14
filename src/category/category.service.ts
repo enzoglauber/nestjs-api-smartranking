@@ -86,7 +86,7 @@ export class CategoryService {
   }
 
   async one(filter: Partial<InsertCategoryDto> = {}): Promise<Category> {
-    const find = await this.category.findOne(filter).exec()
+    const find = await this.category.findOne(filter).populate('Player').exec()
     if (!find) {
       throw new BadRequestException(`Category ${filter.name} not found.`)
     } else {
