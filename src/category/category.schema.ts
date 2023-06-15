@@ -2,16 +2,13 @@ import mongoose from 'mongoose'
 
 export const CategorySchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      unique: true
-    },
-    description: String,
+    name: { type: String, unique: true },
+    description: { type: String },
     events: [
       {
-        name: String,
-        operation: String,
-        value: Number
+        name: { type: String },
+        operation: { type: String },
+        value: { type: Number }
       }
     ],
     players: [
@@ -21,8 +18,5 @@ export const CategorySchema = new mongoose.Schema(
       }
     ]
   },
-  {
-    timestamps: true,
-    collection: 'Category'
-  }
+  { timestamps: true, collection: 'categories' }
 )

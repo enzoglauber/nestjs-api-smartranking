@@ -16,6 +16,6 @@ export const PlayerSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    collection: 'Player'
+    collection: 'players'
   }
 )
