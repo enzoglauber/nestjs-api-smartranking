@@ -9,9 +9,9 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { CategoryService } from 'src/category/category.service'
 import { PlayerService } from 'src/player/player.service'
-import { AtribuirDesafioPartidaDto } from './dtos/atribuir-desafio-partida.dto'
-import { AtualizarDesafioDto } from './dtos/atualizar-desafio.dto'
-import { CriarDesafioDto } from './dtos/criar-desafio.dto'
+import { AddChallengeToMatchDto } from './dtos/add-challenge-to-match.dto'
+import { AddChallengeDto } from './dtos/add-challenge.dto'
+import { UpdateChallengeDto } from './dtos/update-challenge.dto'
 import { ChallengeStatus } from './interfaces/challenge-status.enum'
 import { Challenge, Match } from './interfaces/challenge.interface'
 
@@ -30,14 +30,14 @@ export class ChallengeService {
 
   private readonly logger = new Logger(ChallengeService.name)
 
-  async criarDesafio(criarDesafioDto: CriarDesafioDto): Promise<Challenge> {
+  async criarDesafio(challenge: AddChallengeDto): Promise<Challenge> {
     /*
     Verificar se os jogadores informados estão cadastrados
     */
 
     const jogadores = await this.playerService.all()
 
-    criarDesafioDto.jogadores.map((jogadorDto) => {
+    challenge.players.map((jogadorDto) => {
       const jogadorFilter = jogadores.filter((jogador) => jogador._id == jogadorDto._id)
 
       if (jogadorFilter.length == 0) {
@@ -49,8 +49,8 @@ export class ChallengeService {
     Verificar se o solicitante é um dos jogadores da partida
     */
 
-    const solicitanteEhJogadorDaPartida = await criarDesafioDto.jogadores.filter(
-      (jogador) => jogador._id == criarDesafioDto.solicitante
+    const solicitanteEhJogadorDaPartida = await challenge.players.filter(
+      (jogador) => jogador._id == challenge.solicitante
     )
 
     this.logger.log(`solicitanteEhJogadorDaPartida: ${solicitanteEhJogadorDaPartida}`)
@@ -63,7 +63,7 @@ export class ChallengeService {
     Descobrimos a categoria com base no ID do jogador solicitante
     */
     const categoriaDoJogador = await this.categoryService.consultarCategoriaDoJogador(
-      criarDesafioDto.solicitante
+      challenge.requester
     )
 
     /*
@@ -73,13 +73,13 @@ export class ChallengeService {
       throw new BadRequestException(`O solicitante precisa estar registrado em uma categoria!`)
     }
 
-    const desafioCriado = new this.challenge(criarDesafioDto)
-    desafioCriado.categoria = categoriaDoJogador.categoria
-    desafioCriado.dataHoraSolicitacao = new Date()
+    const desafioCriado = new this.challenge(AddChallengeDto)
+    desafioCriado.category = categoriaDoJogador.category
+    desafioCriado.request = new Date()
     /*
     Quando um desafio for criado, definimos o status desafio como pendente
     */
-    desafioCriado.status = ChallengeStatus.PENDENTE
+    desafioCriado.status = ChallengeStatus.PENDING
     this.logger.log(`desafioCriado: ${JSON.stringify(desafioCriado)}`)
     return await desafioCriado.save()
   }
@@ -94,7 +94,7 @@ export class ChallengeService {
   }
 
   async consultarDesafiosDeUmJogador(_id: any): Promise<Array<Challenge>> {
-    const jogadores = await this.playerService.consultarTodosJogadores()
+    const jogadores = await this.playerService.all()
 
     const jogadorFilter = jogadores.filter((jogador) => jogador._id == _id)
 
@@ -112,7 +112,7 @@ export class ChallengeService {
       .exec()
   }
 
-  async atualizarDesafio(_id: string, atualizarDesafioDto: AtualizarDesafioDto): Promise<void> {
+  async atualizarDesafio(_id: string, challenge: UpdateChallengeDto): Promise<void> {
     const desafioEncontrado = await this.challenge.findById(_id).exec()
 
     if (!desafioEncontrado) {
@@ -122,18 +122,18 @@ export class ChallengeService {
     /*
     Atualizaremos a data da resposta quando o status do desafio vier preenchido 
     */
-    if (atualizarDesafioDto.status) {
-      desafioEncontrado.dataHoraResposta = new Date()
+    if (challenge.status) {
+      desafioEncontrado.response = new Date()
     }
-    desafioEncontrado.status = atualizarDesafioDto.status
-    desafioEncontrado.dataHoraDesafio = atualizarDesafioDto.dataHoraDesafio
+    desafioEncontrado.status = challenge.status
+    desafioEncontrado.when = challenge.when
 
     await this.challenge.findOneAndUpdate({ _id }, { $set: desafioEncontrado }).exec()
   }
 
   async atribuirDesafioPartida(
     _id: string,
-    atribuirDesafioPartidaDto: AtribuirDesafioPartidaDto
+    addChallengeToMatchDto: AddChallengeToMatchDto
   ): Promise<void> {
     const desafioEncontrado = await this.challenge.findById(_id).exec()
 
@@ -144,8 +144,8 @@ export class ChallengeService {
     /*
     Verificar se o jogador vencedor faz parte do desafio
     */
-    const jogadorFilter = desafioEncontrado.jogadores.filter(
-      (jogador) => jogador._id == atribuirDesafioPartidaDto.def
+    const jogadorFilter = desafioEncontrado.players.filter(
+      (jogador) => jogador._id == addChallengeToMatchDto.def
     )
 
     this.logger.log(`desafioEncontrado: ${desafioEncontrado}`)
@@ -158,17 +158,17 @@ export class ChallengeService {
     /*
     Primeiro vamos criar e persistir o objeto partida
     */
-    const partidaCriada = new this.match(atribuirDesafioPartidaDto)
+    const partidaCriada = new this.match(AddChallengeToMatchDto)
 
     /*
     Atribuir ao objeto partida a categoria recuperada no desafio
     */
-    partidaCriada.categoria = desafioEncontrado.categoria
+    partidaCriada.category = desafioEncontrado.category
 
     /*
     Atribuir ao objeto partida os jogadores que fizeram parte do desafio
     */
-    partidaCriada.jogadores = desafioEncontrado.jogadores
+    partidaCriada.players = desafioEncontrado.players
 
     const resultado = await partidaCriada.save()
 
@@ -176,7 +176,7 @@ export class ChallengeService {
     Quando uma partida for registrada por um usuário, mudaremos o 
     status do desafio para realizado
     */
-    desafioEncontrado.status = ChallengeStatus.REALIZADO
+    desafioEncontrado.status = ChallengeStatus.DONE
 
     /*  
     Recuperamos o ID da partida e atribuimos ao desafio
@@ -206,7 +206,7 @@ export class ChallengeService {
     Realizaremos a deleção lógica do desafio, modificando seu status para
     CANCELADO
     */
-    desafioEncontrado.status = ChallengeStatus.CANCELADO
+    desafioEncontrado.status = ChallengeStatus.CANCELED
 
     await this.challenge.findOneAndUpdate({ _id }, { $set: desafioEncontrado }).exec()
   }
