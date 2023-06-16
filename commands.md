@@ -12,3 +12,7 @@ nest g service player
 
 npm install mongodb
 mongodb+srv://root:<password>@cluster0.qpxt5ib.mongodb.net/?retryWrites=true&w=majority
+
+nest g module challenge
+nest g controller challenge
+nest g service challenge

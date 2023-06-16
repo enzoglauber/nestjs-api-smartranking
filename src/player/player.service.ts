@@ -38,6 +38,10 @@ export class PlayerService {
     }
   }
 
+  async all(): Promise<Player[]> {
+    return await this.player.find({}).exec()
+  }
+
   async findById(_id?: string): Promise<Player> {
     const notFound = !(await this.player.findOne({ _id }).exec())
     if (notFound) {
