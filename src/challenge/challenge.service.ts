@@ -15,10 +15,6 @@ import { UpdateChallengeDto } from './dtos/update-challenge.dto'
 import { ChallengeStatus } from './interfaces/challenge-status.enum'
 import { Challenge, Match } from './interfaces/challenge.interface'
 
-/*
-ChallengeService
-*/
-
 @Injectable()
 export class ChallengeService {
   constructor(
@@ -30,7 +26,7 @@ export class ChallengeService {
 
   private readonly logger = new Logger(ChallengeService.name)
 
-  async criarDesafio(challenge: AddChallengeDto): Promise<Challenge> {
+  async addChallenge(challenge: AddChallengeDto): Promise<Challenge> {
     /*
     Verificar se os jogadores informados estão cadastrados
     */
