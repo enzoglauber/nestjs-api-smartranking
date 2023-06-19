@@ -58,9 +58,7 @@ export class ChallengeService {
     /*
     Descobrimos a categoria com base no ID do jogador solicitante
     */
-    const categoriaDoJogador = await this.categoryService.consultarCategoriaDoJogador(
-      challenge.requester
-    )
+    const categoriaDoJogador = await this.categoryService.findByPlayer(challenge.requester)
 
     /*
     Para prosseguir o solicitante deve fazer parte de uma categoria
@@ -70,7 +68,7 @@ export class ChallengeService {
     }
 
     const desafioCriado = new this.challenge(AddChallengeDto)
-    desafioCriado.category = categoriaDoJogador.category
+    desafioCriado.category = categoriaDoJogador.name
     desafioCriado.request = new Date()
     /*
     Quando um desafio for criado, definimos o status desafio como pendente

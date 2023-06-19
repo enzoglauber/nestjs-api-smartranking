@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
+import { Player } from 'src/player/player.interface'
 import { PlayerService } from 'src/player/player.service'
 import { Category } from './category.interface'
 import { InsertCategoryDto } from './dtos/insert-category.dto'
@@ -94,24 +95,15 @@ export class CategoryService {
     }
   }
 
-  async consultarCategoriaDoJogador(idJogador: any): Promise<Categoria> {
-    /*
-    Desafio
-    Escopo da exceção realocado para o próprio Categorias Service
-    Verificar se o jogador informado já se encontra cadastrado
-    */
+  async findByPlayer(idPlayer: any): Promise<Category> {
+    const players = await this.playerService.all()
+    const filter = players.filter((player: Player) => player._id == idPlayer)
 
-    //await this.jogadoresService.consultarJogadorPeloId(idJogador)
-
-    const jogadores = await this.jogadoresService.consultarTodosJogadores()
-
-    const jogadorFilter = jogadores.filter((jogador) => jogador._id == idJogador)
-
-    if (jogadorFilter.length == 0) {
-      throw new BadRequestException(`O id ${idJogador} não é um jogador!`)
+    if (filter.length == 0) {
+      throw new BadRequestException(`Id ${idPlayer} isn't player!`)
     }
 
-    return await this.categoriaModel.findOne().where('jogadores').in(idJogador).exec()
+    return await this.category.findOne().where('players').in(idPlayer).exec()
   }
 
   private async exists(filter: Partial<InsertCategoryDto>) {
