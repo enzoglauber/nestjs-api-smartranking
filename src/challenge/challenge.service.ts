@@ -26,18 +26,18 @@ export class ChallengeService {
 
   private readonly logger = new Logger(ChallengeService.name)
 
-  async addChallenge(challenge: AddChallengeDto): Promise<Challenge> {
+  async addChallenge(challengeDto: AddChallengeDto): Promise<Challenge> {
     /*
     Verificar se os jogadores informados estão cadastrados
     */
 
-    const jogadores = await this.playerService.all()
+    const players = await this.playerService.all()
 
-    challenge.players.map((jogadorDto) => {
-      const jogadorFilter = jogadores.filter((jogador) => jogador._id == jogadorDto._id)
+    challengeDto.players.map((challengePlayer) => {
+      const filter = players.filter((player) => player._id == challengePlayer._id)
 
-      if (jogadorFilter.length == 0) {
-        throw new BadRequestException(`O id ${jogadorDto._id} não é um jogador!`)
+      if (filter.length == 0) {
+        throw new BadRequestException(`The id ${challengePlayer._id} isn't a player!`)
       }
     })
 
@@ -45,37 +45,37 @@ export class ChallengeService {
     Verificar se o solicitante é um dos jogadores da partida
     */
 
-    const solicitanteEhJogadorDaPartida = await challenge.players.filter(
-      (jogador) => jogador._id == challenge.solicitante
+    const isMatchRequester = challengeDto.players.filter(
+      (player) => player._id == challengeDto.requester.toString()
     )
 
-    this.logger.log(`solicitanteEhJogadorDaPartida: ${solicitanteEhJogadorDaPartida}`)
+    this.logger.log(`isMatchRequester: ${isMatchRequester}`)
 
-    if (solicitanteEhJogadorDaPartida.length == 0) {
-      throw new BadRequestException(`O solicitante deve ser um jogador da partida!`)
+    if (isMatchRequester.length == 0) {
+      throw new BadRequestException(`The resquester has to be a player in the match`)
     }
 
     /*
     Descobrimos a categoria com base no ID do jogador solicitante
     */
-    const categoriaDoJogador = await this.categoryService.findByPlayer(challenge.requester)
+    const playerCategory = await this.categoryService.findByPlayer(challengeDto.requester)
 
     /*
     Para prosseguir o solicitante deve fazer parte de uma categoria
     */
-    if (!categoriaDoJogador) {
-      throw new BadRequestException(`O solicitante precisa estar registrado em uma categoria!`)
+    if (!playerCategory) {
+      throw new BadRequestException(`The requester must be registered in a category!`)
     }
 
-    const desafioCriado = new this.challenge(AddChallengeDto)
-    desafioCriado.category = categoriaDoJogador.name
-    desafioCriado.request = new Date()
+    const challenge = new this.challenge(challengeDto)
+    challenge.category = playerCategory.name
+    challenge.request = new Date()
     /*
     Quando um desafio for criado, definimos o status desafio como pendente
     */
-    desafioCriado.status = ChallengeStatus.PENDING
-    this.logger.log(`desafioCriado: ${JSON.stringify(desafioCriado)}`)
-    return await desafioCriado.save()
+    challenge.status = ChallengeStatus.PENDING
+    this.logger.log(`challenge: ${JSON.stringify(challenge)}`)
+    return await challenge.save()
   }
 
   async consultarTodosDesafios(): Promise<Array<Challenge>> {
