@@ -26,24 +26,24 @@ export class ChallengeController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  async addChallenge(@Body() challenge: AddChallengeDto): Promise<Challenge> {
+  async add(@Body() challenge: AddChallengeDto): Promise<Challenge> {
     this.logger.log(`challenge: ${JSON.stringify(challenge)}`)
-    return await this.challengeService.addChallenge(challenge)
+    return await this.challengeService.add(challenge)
   }
 
   @Get()
-  async consultarDesafios(@Query('idPlayer') _id: string): Promise<Challenge[]> {
+  async search(@Query('idPlayer') _id: string): Promise<Challenge[]> {
     return _id
-      ? await this.challengeService.consultarDesafiosDeUmJogador(_id)
-      : await this.challengeService.consultarTodosDesafios()
+      ? await this.challengeService.byIdPlayer(_id)
+      : await this.challengeService.all()
   }
 
   @Put('/:_id')
-  async atualizarDesafio(
+  async update(
     @Body(ChallengeStatusValidacaoPipe) challenge: UpdateChallengeDto,
     @Param('_id') _id: string
   ): Promise<void> {
-    await this.challengeService.atualizarDesafio(_id, challenge)
+    await this.challengeService.update(_id, challenge)
   }
 
   @Post('/:_id/match/')

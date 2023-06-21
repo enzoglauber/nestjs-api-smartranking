@@ -26,7 +26,7 @@ export class ChallengeService {
 
   private readonly logger = new Logger(ChallengeService.name)
 
-  async addChallenge(challengeDto: AddChallengeDto): Promise<Challenge> {
+  async add(challengeDto: AddChallengeDto): Promise<Challenge> {
     /*
     Verificar se os jogadores informados estão cadastrados
     */
@@ -78,51 +78,50 @@ export class ChallengeService {
     return await challenge.save()
   }
 
-  async consultarTodosDesafios(): Promise<Array<Challenge>> {
+  async all(): Promise<Challenge[]> {
     return await this.challenge
       .find()
-      .populate('solicitante')
-      .populate('jogadores')
-      .populate('partida')
+      .populate('requester')
+      .populate('players')
+      .populate('match')
       .exec()
   }
 
-  async consultarDesafiosDeUmJogador(_id: any): Promise<Array<Challenge>> {
-    const jogadores = await this.playerService.all()
+  async byIdPlayer(_id: string): Promise<Challenge[]> {
+    const players = await this.playerService.all()
+    const filter = players.filter((player) => player._id == _id)
 
-    const jogadorFilter = jogadores.filter((jogador) => jogador._id == _id)
-
-    if (jogadorFilter.length == 0) {
-      throw new BadRequestException(`O id ${_id} não é um jogador!`)
+    if (filter.length == 0) {
+      throw new BadRequestException(`The ${_id} isn't a player!`)
     }
 
     return await this.challenge
       .find()
-      .where('jogadores')
-      .in(_id)
-      .populate('solicitante')
-      .populate('jogadores')
-      .populate('partida')
+      .where('players')
+      .in([_id])
+      .populate('requester')
+      .populate('players')
+      .populate('match')
       .exec()
   }
 
-  async atualizarDesafio(_id: string, challenge: UpdateChallengeDto): Promise<void> {
-    const desafioEncontrado = await this.challenge.findById(_id).exec()
+  async update(_id: string, challengeDto: UpdateChallengeDto): Promise<void> {
+    const challenge = await this.challenge.findById(_id).exec()
 
-    if (!desafioEncontrado) {
+    if (!challenge) {
       throw new NotFoundException(`Desafio ${_id} não cadastrado!`)
     }
 
     /*
     Atualizaremos a data da resposta quando o status do desafio vier preenchido 
     */
-    if (challenge.status) {
-      desafioEncontrado.response = new Date()
+    if (challengeDto.status) {
+      challenge.response = new Date()
     }
-    desafioEncontrado.status = challenge.status
-    desafioEncontrado.when = challenge.when
+    challenge.status = challengeDto.status
+    challenge.when = challengeDto.when
 
-    await this.challenge.findOneAndUpdate({ _id }, { $set: desafioEncontrado }).exec()
+    await this.challenge.findOneAndUpdate({ _id }, { $set: challenge }).exec()
   }
 
   async atribuirDesafioPartida(
@@ -139,7 +138,7 @@ export class ChallengeService {
     Verificar se o jogador vencedor faz parte do desafio
     */
     const jogadorFilter = desafioEncontrado.players.filter(
-      (jogador) => jogador._id == addChallengeToMatchDto.def
+      (jogador) => jogador._id == addChallengeToMatchDto.winner.toString()
     )
 
     this.logger.log(`desafioEncontrado: ${desafioEncontrado}`)
@@ -175,7 +174,7 @@ export class ChallengeService {
     /*  
     Recuperamos o ID da partida e atribuimos ao desafio
     */
-    desafioEncontrado.partida = resultado._id
+    desafioEncontrado.match = resultado._id
 
     try {
       await this.challenge.findOneAndUpdate({ _id }, { $set: desafioEncontrado }).exec()
