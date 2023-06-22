@@ -124,66 +124,66 @@ export class ChallengeService {
     await this.challenge.findOneAndUpdate({ _id }, { $set: challenge }).exec()
   }
 
-  async atribuirDesafioPartida(
+  async addChallengeMatch(
     _id: string,
     addChallengeToMatchDto: AddChallengeToMatchDto
   ): Promise<void> {
-    const desafioEncontrado = await this.challenge.findById(_id).exec()
+    const challenge = await this.challenge.findById(_id).exec()
 
-    if (!desafioEncontrado) {
-      throw new BadRequestException(`Desafio ${_id} não cadastrado!`)
+    if (!challenge) {
+      throw new BadRequestException(`Challenge ${_id} not registered!`)
     }
 
     /*
     Verificar se o jogador vencedor faz parte do desafio
     */
-    const jogadorFilter = desafioEncontrado.players.filter(
+    const player = challenge.players.filter(
       (jogador) => jogador._id == addChallengeToMatchDto.winner.toString()
     )
 
-    this.logger.log(`desafioEncontrado: ${desafioEncontrado}`)
-    this.logger.log(`jogadorFilter: ${jogadorFilter}`)
+    this.logger.log(`challenge: ${challenge}`)
+    this.logger.log(`player: ${player}`)
 
-    if (jogadorFilter.length == 0) {
-      throw new BadRequestException(`O jogador vencedor não faz parte do desafio!`)
+    if (player.length == 0) {
+      throw new BadRequestException(`The winning player is not part of the challenge!`)
     }
 
     /*
     Primeiro vamos criar e persistir o objeto partida
     */
-    const partidaCriada = new this.match(AddChallengeToMatchDto)
+    const match = new this.match(addChallengeToMatchDto)
 
     /*
     Atribuir ao objeto partida a categoria recuperada no desafio
     */
-    partidaCriada.category = desafioEncontrado.category
+    match.category = challenge.category
 
     /*
     Atribuir ao objeto partida os jogadores que fizeram parte do desafio
     */
-    partidaCriada.players = desafioEncontrado.players
+    match.players = challenge.players
 
-    const resultado = await partidaCriada.save()
+    const result = await match.save()
 
     /*
     Quando uma partida for registrada por um usuário, mudaremos o 
     status do desafio para realizado
     */
-    desafioEncontrado.status = ChallengeStatus.DONE
+    challenge.status = ChallengeStatus.DONE
 
     /*  
     Recuperamos o ID da partida e atribuimos ao desafio
     */
-    desafioEncontrado.match = resultado._id
+    challenge.match = result._id
 
     try {
-      await this.challenge.findOneAndUpdate({ _id }, { $set: desafioEncontrado }).exec()
+      await this.challenge.findOneAndUpdate({ _id }, { $set: challenge }).exec()
     } catch (error) {
       /*
       Se a atualização do desafio falhar excluímos a partida 
       gravada anteriormente
       */
-      await this.match.deleteOne({ _id: resultado._id }).exec()
+      await this.match.deleteOne({ _id: result._id }).exec()
       throw new InternalServerErrorException()
     }
   }

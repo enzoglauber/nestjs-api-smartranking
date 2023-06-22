@@ -47,11 +47,11 @@ export class ChallengeController {
   }
 
   @Post('/:_id/match/')
-  async atribuirDesafioPartida(
+  async addChallengeMatch(
     @Body(ValidationPipe) addChallengeToMatchDto: AddChallengeToMatchDto,
     @Param('_id') _id: string
   ): Promise<void> {
-    return await this.challengeService.atribuirDesafioPartida(_id, addChallengeToMatchDto)
+    return await this.challengeService.addChallengeMatch(_id, addChallengeToMatchDto)
   }
 
   @Delete('/:_id')
