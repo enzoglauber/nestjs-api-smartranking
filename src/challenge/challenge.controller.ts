@@ -55,7 +55,7 @@ export class ChallengeController {
   }
 
   @Delete('/:_id')
-  async deletarDesafio(@Param('_id') _id: string): Promise<void> {
-    await this.challengeService.deletarDesafio(_id)
+  async remove(@Param('_id') _id: string): Promise<void> {
+    await this.challengeService.remove(_id)
   }
 }

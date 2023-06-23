@@ -2,8 +2,7 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
-  Logger,
-  NotFoundException
+  Logger
 } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
@@ -109,7 +108,7 @@ export class ChallengeService {
     const challenge = await this.challenge.findById(_id).exec()
 
     if (!challenge) {
-      throw new NotFoundException(`Desafio ${_id} não cadastrado!`)
+      throw new BadRequestException(`Challenge ${_id} isn't registered!`)
     }
 
     /*
@@ -188,19 +187,19 @@ export class ChallengeService {
     }
   }
 
-  async deletarDesafio(_id: string): Promise<void> {
-    const desafioEncontrado = await this.challenge.findById(_id).exec()
+  async remove(_id: string): Promise<void> {
+    const challenge = await this.challenge.findById(_id).exec()
 
-    if (!desafioEncontrado) {
-      throw new BadRequestException(`Desafio ${_id} não cadastrado!`)
+    if (!challenge) {
+      throw new BadRequestException(`Challenge ${_id} isn't registered!`)
     }
 
     /*
     Realizaremos a deleção lógica do desafio, modificando seu status para
     CANCELADO
     */
-    desafioEncontrado.status = ChallengeStatus.CANCELED
+    challenge.status = ChallengeStatus.CANCELED
 
-    await this.challenge.findOneAndUpdate({ _id }, { $set: desafioEncontrado }).exec()
+    await this.challenge.findOneAndUpdate({ _id }, { $set: challenge }).exec()
   }
 }
