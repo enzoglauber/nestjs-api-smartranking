@@ -8,8 +8,8 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { CategoryService } from 'src/category/category.service'
 import { PlayerService } from 'src/player/player.service'
-import { AddChallengeToMatchDto } from './dtos/add-challenge-to-match.dto'
 import { AddChallengeDto } from './dtos/add-challenge.dto'
+import { AddMatchToChallenge } from './dtos/add-match-to-challenge.dto'
 import { UpdateChallengeDto } from './dtos/update-challenge.dto'
 import { ChallengeStatus } from './interfaces/challenge-status.enum'
 import { Challenge, Match } from './interfaces/challenge.interface'
@@ -123,10 +123,7 @@ export class ChallengeService {
     await this.challenge.findOneAndUpdate({ _id }, { $set: challenge }).exec()
   }
 
-  async addChallengeMatch(
-    _id: string,
-    addChallengeToMatchDto: AddChallengeToMatchDto
-  ): Promise<void> {
+  async addMatch(_id: string, addMatchToChallenge: AddMatchToChallenge): Promise<void> {
     const challenge = await this.challenge.findById(_id).exec()
 
     if (!challenge) {
@@ -137,7 +134,7 @@ export class ChallengeService {
     Verificar se o jogador vencedor faz parte do desafio
     */
     const player = challenge.players.filter(
-      (jogador) => jogador._id == addChallengeToMatchDto.winner.toString()
+      (jogador) => jogador._id == addMatchToChallenge.winner.toString()
     )
 
     this.logger.log(`challenge: ${challenge}`)
@@ -150,7 +147,7 @@ export class ChallengeService {
     /*
     Primeiro vamos criar e persistir o objeto partida
     */
-    const match = new this.match(addChallengeToMatchDto)
+    const match = new this.match(addMatchToChallenge)
 
     /*
     Atribuir ao objeto partida a categoria recuperada no desafio

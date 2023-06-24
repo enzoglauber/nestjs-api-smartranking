@@ -12,8 +12,8 @@ import {
   ValidationPipe
 } from '@nestjs/common'
 import { ChallengeService } from './challenge.service'
-import { AddChallengeToMatchDto } from './dtos/add-challenge-to-match.dto'
 import { AddChallengeDto } from './dtos/add-challenge.dto'
+import { AddMatchToChallenge } from './dtos/add-match-to-challenge.dto'
 import { UpdateChallengeDto } from './dtos/update-challenge.dto'
 import { Challenge } from './interfaces/challenge.interface'
 import { ChallengeStatusValidacaoPipe } from './pipes/challenge-status-validation.pipe'
@@ -33,9 +33,7 @@ export class ChallengeController {
 
   @Get()
   async search(@Query('idPlayer') _id: string): Promise<Challenge[]> {
-    return _id
-      ? await this.challengeService.byIdPlayer(_id)
-      : await this.challengeService.all()
+    return _id ? await this.challengeService.byIdPlayer(_id) : await this.challengeService.all()
   }
 
   @Put('/:_id')
@@ -48,10 +46,10 @@ export class ChallengeController {
 
   @Post('/:_id/match/')
   async addChallengeMatch(
-    @Body(ValidationPipe) addChallengeToMatchDto: AddChallengeToMatchDto,
+    @Body(ValidationPipe) match: AddMatchToChallenge,
     @Param('_id') _id: string
   ): Promise<void> {
-    return await this.challengeService.addChallengeMatch(_id, addChallengeToMatchDto)
+    return await this.challengeService.addMatch(_id, match)
   }
 
   @Delete('/:_id')
