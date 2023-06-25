@@ -134,7 +134,7 @@ export class ChallengeService {
     Verificar se o jogador vencedor faz parte do desafio
     */
     const player = challenge.players.filter(
-      (jogador) => jogador._id == addMatchToChallenge.winner.toString()
+      (player) => player._id == addMatchToChallenge.winner.toString()
     )
 
     this.logger.log(`challenge: ${challenge}`)
