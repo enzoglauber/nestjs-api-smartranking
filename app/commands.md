@@ -16,3 +16,8 @@ mongodb+srv://root:<password>@cluster0.qpxt5ib.mongodb.net/?retryWrites=true&w=m
 nest g module challenge
 nest g controller challenge
 nest g service challenge
+
+
+npm i @nestjs/microservices
+npm i amqplib amqp-connection-manager --legacy-peer-deps
+npm i moment-timezone --legacy-peer-deps  
