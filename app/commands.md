@@ -17,7 +17,9 @@ nest g module challenge
 nest g controller challenge
 nest g service challenge
 
-
 npm i @nestjs/microservices
 npm i amqplib amqp-connection-manager --legacy-peer-deps
-npm i moment-timezone --legacy-peer-deps  
+npm i moment-timezone --legacy-peer-deps
+
+npm install dotenv --legacy-peer-deps
+npm install --save-dev @types/dotenv --legacy-peer-deps

@@ -1,5 +1,5 @@
 import { ArrayMinSize, IsArray, IsNotEmpty, IsString } from 'class-validator'
-import { Event } from '../category.interface'
+import { Event } from './event.interface'
 
 export class UpdateCategoryDto {
   _id?: string
