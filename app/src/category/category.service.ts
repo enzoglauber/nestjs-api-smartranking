@@ -14,7 +14,7 @@ export class CategoryService {
     private readonly playerService: PlayerService
   ) {}
 
-  async insert(category: InsertCategoryDto): Promise<Category> {
+  async add(category: InsertCategoryDto): Promise<Category> {
     const { name } = category
     const notFind = !(await this.exists({ name }))
     if (notFind) {

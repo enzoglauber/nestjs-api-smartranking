@@ -9,8 +9,8 @@ export class CategoryController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  async insert(@Body() category: InsertCategoryDto): Promise<Category> {
-    return await this.categoryService.insert(category)
+  async add(@Body() category: InsertCategoryDto): Promise<Category> {
+    return await this.categoryService.add(category)
   }
 
   @Get()
