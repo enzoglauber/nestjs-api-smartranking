@@ -23,30 +23,30 @@ export class CategoryService {
     }
   }
 
-  async atribuirCategoriaJogador(params: string[]): Promise<void> {
-    const name = params['name']
-    const idPlayer = params['idPlayer']
+  // async addPlayerToCategory(params: string[]): Promise<void> {
+  //   const name = params['name']
+  //   const idPlayer = params['idPlayer']
 
-    const categoriaEncontrada = await this.category.findOne({ name }).exec()
-    const jogadorJaCadastradoCategoria = await this.category
-      .find({ name })
-      .where('players')
-      .in(idPlayer)
-      .exec()
+  //   const categoriaEncontrada = await this.category.findOne({ name }).exec()
+  //   const jogadorJaCadastradoCategoria = await this.category
+  //     .find({ name })
+  //     .where('players')
+  //     .in(idPlayer)
+  //     .exec()
 
-    await this.playerService.findById(idPlayer)
+  //   await this.playerService.findById(idPlayer)
 
-    if (!categoriaEncontrada) {
-      throw new BadRequestException(`Categoria ${name} não cadastrada!`)
-    }
+  //   if (!categoriaEncontrada) {
+  //     throw new BadRequestException(`Categoria ${name} não cadastrada!`)
+  //   }
 
-    if (jogadorJaCadastradoCategoria.length > 0) {
-      throw new BadRequestException(`Jogador ${idPlayer} já cadastrado na Categoria ${name}!`)
-    }
+  //   if (jogadorJaCadastradoCategoria.length > 0) {
+  //     throw new BadRequestException(`Jogador ${idPlayer} já cadastrado na Categoria ${name}!`)
+  //   }
 
-    categoriaEncontrada.players.push(idPlayer)
-    await this.category.findOneAndUpdate({ name }, { $set: categoriaEncontrada }).exec()
-  }
+  //   categoriaEncontrada.players.push(idPlayer)
+  //   await this.category.findOneAndUpdate({ name }, { $set: categoriaEncontrada }).exec()
+  // }
 
   async addPlayer(name: string, idPlayer: any): Promise<void> {
     const category = await this.category.findOne({ name }).exec()
