@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { RpcException } from '@nestjs/microservices'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Category } from './interfaces/category/category.interface'
@@ -14,11 +15,11 @@ export class AppService {
   ) {}
 
   async addCategory(category: InsertCategoryDto): Promise<Category> {
-    const { name } = category
-    const notFind = !(await this.existsCategory({ name }))
-    if (notFind) {
+    try {
       const created = new this.category(category)
       return await created.save()
+    } catch (error) {
+      throw new RpcException(error.message)
     }
   }
 
@@ -79,14 +80,4 @@ export class AppService {
 
   //   return await this.category.findOne().where('players').in(idPlayer).exec()
   // }
-
-  private async existsCategory(filter: Partial<InsertCategoryDto>) {
-    const find = await this.category.findOne(filter).exec()
-
-    if (find) {
-      throw new BadRequestException(`Category ${filter.name} already registered.`)
-    } else {
-      return find
-    }
-  }
 }
