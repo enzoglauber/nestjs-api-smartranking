@@ -14,9 +14,7 @@ import { PlayerSchema } from './interfaces/player/player.schema'
       useFactory: async (configService: ConfigService) => ({
         uri: configService.get('MONGODB_URI'),
         useNewUrlParser: true,
-        useCreateIndex: true,
-        useUnifiedTopology: true,
-        useFindAndModify: true
+        useUnifiedTopology: true
       }),
       inject: [ConfigService]
     }),
