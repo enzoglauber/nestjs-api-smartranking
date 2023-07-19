@@ -11,6 +11,6 @@ export class AppController {
   @EventPattern('add-category')
   async addCategory(@Payload() category: Category): Promise<Category> {
     this.logger.log(`category: ${JSON.stringify(category)}`)
-    return this.appService.addCategory(category)
+    return await this.appService.addCategory(category)
   }
 }

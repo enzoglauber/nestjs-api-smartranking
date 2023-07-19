@@ -1,12 +1,11 @@
-import { Body, Controller, Logger, Post, UsePipes } from '@nestjs/common'
+import { Body, Controller, Logger, Post, Query, UsePipes } from '@nestjs/common'
 import { ClientProxy, ClientProxyFactory } from '@nestjs/microservices'
 import { Transport } from '@nestjs/microservices/enums'
 import * as dotenv from 'dotenv'
-import { tap } from 'rxjs'
+import { Observable, tap } from 'rxjs'
 import { InsertCategoryDto } from './shared/dtos/insert-category.dto'
 import { ParamsValidationPipe } from './shared/pipes/params-validation.pipe'
 dotenv.config() // Carrega as variáveis de ambiente do arquivo .env
-
 @Controller('api/v1')
 export class AppController {
   private clientProxy: ClientProxy
@@ -25,7 +24,12 @@ export class AppController {
 
   @Post('category')
   @UsePipes(ParamsValidationPipe)
-  async add(@Body() category: InsertCategoryDto) {
-    return await this.clientProxy.emit('add-category', category).pipe(tap(() => this.logger.log('legal')))
+  add(@Body() category: InsertCategoryDto) {
+    this.clientProxy.emit('add-category', category).pipe(tap(() => this.logger.log('legal')))
+  }
+
+  allCategory(@Query('idCategory') id: string): Observable<any> {
+    this.logger.log(`category: ${JSON.stringify(id)}`)
+    return this.clientProxy.send('all-categories', id ? id : '')
   }
 }
