@@ -23,6 +23,14 @@ export class AppService {
     }
   }
 
+  async allCategories(filter: Partial<InsertCategoryDto> = {}): Promise<Category[]> {
+    try {
+      return await this.category.find(filter).populate('players').exec()
+    } catch (error) {
+      throw new RpcException(error.message)
+    }
+  }
+
   async addPlayerToCategory(name: string, idPlayer: any): Promise<void> {
     const category = await this.category.findOne({ name }).exec()
     if (!category) {
@@ -55,10 +63,6 @@ export class AppService {
     }
 
     await this.category.findOneAndUpdate({ name }, { $set: category }, { upsert: true }).exec()
-  }
-
-  async allCategories(filter: Partial<InsertCategoryDto> = {}): Promise<Category[]> {
-    return await this.category.find(filter).populate('players').exec()
   }
 
   async oneCategory(filter: Partial<InsertCategoryDto> = {}): Promise<Category> {
