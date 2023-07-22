@@ -21,13 +21,20 @@ module.exports = {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-explicit-any': 'off'
-  },
-  'prettier/prettier': [
-    'error',
-    {
-      singleQuote: true,
-      parser: 'flow'
-    }
-  ]
+    '@typescript-eslint/no-explicit-any': 'off',
+    printWidth: 100,
+    tabWidth: 2,
+    singleQuote: true,
+    trailingComma: 'none',
+    arrowParens: 'always',
+    semi: false,
+    endOfLine: 'auto'
+  }
+  // 'prettier/prettier': [
+  //   'error',
+  //   {
+  //     singleQuote: true,
+  //     parser: 'flow'
+  //   }
+  // ]
 }
