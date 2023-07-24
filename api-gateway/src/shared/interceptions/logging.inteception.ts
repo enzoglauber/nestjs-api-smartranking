@@ -1,7 +1,7 @@
-import { CallHandler, Catch, ExecutionContext, Logger, NestInterceptor } from '@nestjs/common'
+import { CallHandler, ExecutionContext, Injectable, Logger, NestInterceptor } from '@nestjs/common'
 import { Observable, tap } from 'rxjs'
 
-@Catch()
+@Injectable()
 export class LoggingInteceptor implements NestInterceptor {
   private readonly logger = new Logger(LoggingInteceptor.name)
 
