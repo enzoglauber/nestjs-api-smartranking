@@ -13,6 +13,7 @@ async function bootstrap() {
         urls: [
           `amqp://${process.env.RMQ_USER}:${process.env.RMQ_PASSWORD}@${process.env.RMQ_IP}/smartranking`
         ],
+        noAck: false, // força o rmq somente deletar o item na fila após a confirmação
         queue: 'admin-backend'
       }
     },

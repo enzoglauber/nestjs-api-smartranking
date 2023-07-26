@@ -1,5 +1,5 @@
 import { Controller, Logger } from '@nestjs/common'
-import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices'
+import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/microservices'
 import { AppService } from './app.service'
 import { Category } from './interfaces/category/category.interface'
 
@@ -9,7 +9,10 @@ export class AppController {
   logger = new Logger(AppController.name)
 
   @EventPattern('add-category')
-  addCategory(@Payload() category: Category) {
+  addCategory(@Payload() category: Category, @Ctx() context: RmqContext) {
+    const channel = context.getChannelRef()
+    const message = context.getMessage()
+    
     this.logger.log(`category: ${JSON.stringify(category)}`)
     this.appService.addCategory(category)
   }
