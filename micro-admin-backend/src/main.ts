@@ -22,5 +22,5 @@ async function bootstrap() {
   logger.log('Microservices is listening');
 }
 bootstrap().catch((error) => {
-  logger.error('Error starting microservices', error);
+  logger.error('Error to starting microservices', error);
 });

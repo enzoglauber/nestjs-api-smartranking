@@ -3,18 +3,29 @@ import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/
 import { AppService } from './app.service'
 import { Category } from './interfaces/category/category.interface'
 
+const errors: string[] = ['E1100']
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
   logger = new Logger(AppController.name)
 
   @EventPattern('add-category')
-  addCategory(@Payload() category: Category, @Ctx() context: RmqContext) {
+  async addCategory(@Payload() category: Category, @Ctx() context: RmqContext) {
     const channel = context.getChannelRef()
     const message = context.getMessage()
     
     this.logger.log(`category: ${JSON.stringify(category)}`)
-    this.appService.addCategory(category)
+    try {
+      await this.appService.addCategory(category)
+      await channel.ack(message) // remove da fila do rmq
+    } catch (err) {
+      this.logger.log(err)
+      errors.map(async (error) => {
+        if (err.message.includes(error)) {
+          await channel.ack(message) // remove da fila do rmq
+        }
+      })
+    }
   }
 
   @MessagePattern('all-categories')
