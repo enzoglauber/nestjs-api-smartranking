@@ -1,5 +1,5 @@
 import { Document } from 'mongoose'
-import { Player } from '../player/player.interface'
+import { Player } from 'src/player/player.interface'
 
 export interface Category extends Document {
   readonly name: string

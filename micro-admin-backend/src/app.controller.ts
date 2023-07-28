@@ -1,7 +1,7 @@
 import { Controller, Logger } from '@nestjs/common'
 import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/microservices'
 import { AppService } from './app.service'
-import { Category } from './interfaces/category/category.interface'
+import { Category } from './category/category.interface'
 
 const errors: string[] = ['E1100']
 @Controller()

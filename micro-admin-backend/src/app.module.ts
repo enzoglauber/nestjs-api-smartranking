@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
-import { CategorySchema } from './interfaces/category/category.schema'
-import { PlayerSchema } from './interfaces/player/player.schema'
+import { CategorySchema } from './category/category.schema'
+import { PlayerSchema } from './player/player.schema'
 
 @Module({
   imports: [
