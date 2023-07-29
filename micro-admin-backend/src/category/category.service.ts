@@ -1,11 +1,11 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
+import { RpcException } from '@nestjs/microservices'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { Player } from 'src/player/player.interface'
 import { PlayerService } from 'src/player/player.service'
 import { Category } from './category.interface'
 import { InsertCategoryDto } from './dtos/insert-category.dto'
-import { UpdateCategoryDto } from './dtos/update-category.dto'
 
 @Injectable()
 export class CategoryService {
@@ -14,14 +14,7 @@ export class CategoryService {
     private readonly playerService: PlayerService
   ) {}
 
-  async add(category: InsertCategoryDto): Promise<Category> {
-    const { name } = category
-    const notFind = !(await this.exists({ name }))
-    if (notFind) {
-      const created = new this.category(category)
-      return await created.save()
-    }
-  }
+  private readonly logger = new Logger(CategoryService.name)
 
   // async addPlayerToCategory(params: string[]): Promise<void> {
   //   const name = params['name']
@@ -73,25 +66,40 @@ export class CategoryService {
     await this.category.findOneAndUpdate({ name }, { $set: category }, { upsert: true }).exec()
   }
 
-  async update(name, category: UpdateCategoryDto): Promise<void> {
-    const notFound = !(await this.category.findOne({ name }).exec())
-    if (notFound) {
-      throw new NotFoundException(`Category ${name} not found`)
+  async add(category: Category): Promise<Category> {
+    try {
+      const created = new this.category(category)
+      return await created.save()
+    } catch (error) {
+      this.logger.error(`error: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
     }
+  }
 
-    await this.category.findOneAndUpdate({ name }, { $set: category }, { upsert: true }).exec()
+  async update(_id: string, category: Category): Promise<void> {
+    try {
+      await this.category.findOneAndUpdate({ _id }, { $set: category }).exec()
+    } catch (error) {
+      this.logger.error(`update error: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
+    }
   }
 
   async all(filter: Partial<InsertCategoryDto> = {}): Promise<Category[]> {
-    return await this.category.find(filter).populate('players').exec()
+    try {
+      return await this.category.find(filter).populate('players').exec()
+    } catch (error) {
+      this.logger.error(`all error: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
+    }
   }
 
   async one(filter: Partial<InsertCategoryDto> = {}): Promise<Category> {
-    const find = await this.category.findOne(filter).populate('players').exec()
-    if (!find) {
-      throw new BadRequestException(`Category ${filter.name} not found.`)
-    } else {
-      return find
+    try {
+      return await this.category.findOne(filter).populate('players').exec()
+    } catch (error) {
+      this.logger.error(`one error: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
     }
   }
 
@@ -104,15 +112,5 @@ export class CategoryService {
     }
 
     return await this.category.findOne().where('players').in(idPlayer).exec()
-  }
-
-  private async exists(filter: Partial<InsertCategoryDto>) {
-    const find = await this.category.findOne(filter).exec()
-
-    if (find) {
-      throw new BadRequestException(`Category ${filter.name} already registered.`)
-    } else {
-      return find
-    }
   }
 }

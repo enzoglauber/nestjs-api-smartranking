@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
-import { CategorySchema } from './category/category.schema'
-import { PlayerSchema } from './player/player.schema'
+import { CategoryModule } from './category/category.module'
 
 @Module({
   imports: [
@@ -18,10 +17,7 @@ import { PlayerSchema } from './player/player.schema'
       }),
       inject: [ConfigService]
     }),
-    MongooseModule.forFeature([
-      { name: 'Player', schema: PlayerSchema },
-      { name: 'Category', schema: CategorySchema }
-    ])
+    CategoryModule
   ],
   controllers: [],
   providers: []

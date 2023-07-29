@@ -1,44 +1,66 @@
-import { Body, Controller, Get, Param, Post, Put, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Controller, Logger } from '@nestjs/common'
+import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/microservices'
 import { Category } from './category.interface'
 import { CategoryService } from './category.service'
-import { InsertCategoryDto } from './dtos/insert-category.dto'
-import { UpdateCategoryDto } from './dtos/update-category.dto'
+
+const errors: string[] = ['E1100']
 @Controller('api/v1/category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
+  logger = new Logger(CategoryController.name)
 
-  @Post()
-  @UsePipes(ValidationPipe)
-  async add(@Body() category: InsertCategoryDto): Promise<Category> {
-    return await this.categoryService.add(category)
+  @EventPattern('add-category')
+  async add(@Payload() category: Category, @Ctx() context: RmqContext): Promise<Category> {
+    const channel = context.getChannelRef()
+    const message = context.getMessage()
+
+    this.logger.log(`category: ${JSON.stringify(category)}`)
+    try {
+      const added = await this.categoryService.add(category)
+      await channel.ack(message) // remove da fila do rmq
+      return added
+    } catch (error) {
+      this.logger.error(`error: ${JSON.stringify(error.message)}`)
+      this.ack(channel, message, error)
+    }
   }
 
-  @Get()
-  async all(@Body() category?: InsertCategoryDto): Promise<Category[]> {
-    return await this.categoryService.all(category)
+  @MessagePattern('all-categories')
+  async all(@Payload() _id: string, @Ctx() context: RmqContext): Promise<Category[] | Category> {
+    const channel = context.getChannelRef()
+    const message = context.getMessage()
+    try {
+      if (_id) {
+        return await this.categoryService.one({ _id })
+      } else {
+        return await this.categoryService.all()
+      }
+    } finally {
+      await channel.ack(message)
+    }
   }
 
-  @Get('/:name')
-  async one(@Param('name') name: string): Promise<Category> {
-    return await this.categoryService.one({ name })
+  @EventPattern('update-category')
+  async update(@Payload() data: any, @Ctx() context: RmqContext) {
+    const channel = context.getChannelRef()
+    const message = context.getMessage()
+    this.logger.log(`data: ${JSON.stringify(data)}`)
+
+    try {
+      const _id: string = data.id
+      const category: Category = data.category
+      await this.categoryService.update(_id, category)
+      await channel.ack(message)
+    } catch (error) {
+      this.ack(channel, message, error)
+    }
   }
 
-  @Put('/:name')
-  @UsePipes(ValidationPipe)
-  async update(@Body() category: UpdateCategoryDto, @Param('name') name: string) {
-    return await this.categoryService.update(name, category)
+  private async ack(channel: any, message: Record<string, any>, error) {
+    const filter = errors.filter((code) => error.message.includes(code))
+
+    if (filter.length) {
+      await channel.ack(message)
+    }
   }
-
-  @Post('/:name/player/:idPlayer')
-  async addPlayer(@Param() params: string[]) {
-    const name = params['name']
-    const idPlayer = params['idPlayer']
-
-    return await this.categoryService.addPlayer(name, idPlayer)
-  }
-
-  // @Delete('/:_id')
-  // async delete(@Param('_id', UpdateCategoryDto) _id: string): Promise<DeleteResult> {
-  //   return await this.categoryService.remove(_id)
-  // }
 }
