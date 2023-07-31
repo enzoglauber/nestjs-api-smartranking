@@ -1,14 +1,16 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { DeleteResult } from 'mongodb'
 import { Model } from 'mongoose'
 import { SavePlayerDto } from './dtos/save-player.dto'
 import { Player } from './player.interface'
 
+import { RpcException } from '@nestjs/microservices'
+
 @Injectable()
 export class PlayerService {
   constructor(@InjectModel('Player') private readonly player: Model<Player>) {}
-
+  private readonly logger = new Logger(PlayerService.name)
   // async save(player: SavePlayerDto): Promise<Player> {
   //   const { _id } = player
   //   const find = await this.find({ _id })
@@ -20,6 +22,16 @@ export class PlayerService {
   //     return await this.insert(player)
   //   }
   // }
+
+  async add(player: Player): Promise<void> {
+    try {
+      const added = new this.player(player)
+      await added.save()
+    } catch (error) {
+      this.logger.error(`error: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
+    }
+  }
 
   async remove(_id?: string): Promise<DeleteResult> {
     const notFound = !(await this.player.findOne({ _id }).exec())
