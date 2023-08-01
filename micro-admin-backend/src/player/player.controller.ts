@@ -1,6 +1,6 @@
 import { Controller, Logger } from '@nestjs/common'
 
-import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices'
+import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/microservices'
 import { Player } from './player.interface'
 import { PlayerService } from './player.service'
 
@@ -22,6 +22,21 @@ export class PlayerController {
     } catch (error) {
       this.logger.log(`error: ${JSON.stringify(error.message)}`)
       this.ack(channel, message, error)
+    }
+  }
+
+  @MessagePattern('all-players')
+  async all(@Payload() _id: string, @Ctx() context: RmqContext): Promise<Player[] | Player> {
+    const channel = context.getChannelRef()
+    const message = context.getMessage()
+    try {
+      if (_id) {
+        return await this.playerService.one({ _id })
+      } else {
+        return await this.playerService.all()
+      }
+    } finally {
+      await channel.ack(message)
     }
   }
 

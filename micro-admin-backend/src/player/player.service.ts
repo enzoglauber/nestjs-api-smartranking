@@ -50,8 +50,22 @@ export class PlayerService {
     }
   }
 
-  async all(): Promise<Player[]> {
-    return await this.player.find({}).exec()
+  async all(filter: Partial<SavePlayerDto> = {}): Promise<Player[]> {
+    try {
+      return await this.player.find(filter).exec()
+    } catch (error) {
+      this.logger.error(`all error: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
+    }
+  }
+
+  async one(filter: Partial<SavePlayerDto> = {}): Promise<Player> {
+    try {
+      return await this.player.findOne(filter).exec()
+    } catch (error) {
+      this.logger.error(`one error: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
+    }
   }
 
   async findById(_id?: string): Promise<Player> {
