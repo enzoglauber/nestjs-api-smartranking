@@ -68,6 +68,15 @@ export class PlayerService {
     }
   }
 
+  async update({ _id, ...player }: SavePlayerDto): Promise<void> {
+    try {
+      this.player.findOneAndUpdate({ _id }, { $set: { ...player } }, { upsert: true }).exec()
+    } catch (error) {
+      this.logger.error(`error: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
+    }
+  }
+
   async findById(_id?: string): Promise<Player> {
     const notFound = !(await this.player.findOne({ _id }).exec())
     if (notFound) {
@@ -75,15 +84,6 @@ export class PlayerService {
     }
 
     return await this.player.findOne({ _id }).exec()
-  }
-
-  async update({ _id, ...player }: SavePlayerDto): Promise<void> {
-    const notFound = !(await this.player.findOne({ _id }).exec())
-    if (notFound) {
-      throw new NotFoundException(`Player id: ${_id} not found`)
-    }
-
-    await this.player.findOneAndUpdate({ _id }, { $set: { ...player } }, { upsert: true }).exec()
   }
 
   async insert(player: SavePlayerDto): Promise<Player> {

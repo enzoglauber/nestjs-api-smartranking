@@ -40,6 +40,18 @@ export class PlayerController {
     }
   }
 
+  @EventPattern('update-player')
+  async edit(@Payload() player: Player, @Ctx() context: RmqContext) {
+    const channel = context.getChannelRef()
+    const message = context.getMessage()
+    try {
+      await this.playerService.update(player)
+      await channel.ack(message)
+    } catch (error) {
+      await channel.ack(message)
+    }
+  }
+
   // @Post()
   // @UsePipes(ValidationPipe)
   // async insert(@Body() player: SavePlayerDto) {
