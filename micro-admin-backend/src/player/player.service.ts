@@ -21,7 +21,7 @@ export class PlayerService {
     }
   }
 
-  async remove(_id?: string): Promise<void> {
+  async remove(_id: string): Promise<void> {
     try {
       await this.player.deleteOne({ _id }).exec()
     } catch (error) {

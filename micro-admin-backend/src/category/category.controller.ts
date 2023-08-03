@@ -56,6 +56,18 @@ export class CategoryController {
     }
   }
 
+  @EventPattern('remove-category')
+  async remove(@Payload() _id: string, @Ctx() context: RmqContext) {
+    const channel = context.getChannelRef()
+    const message = context.getMessage()
+    try {
+      await this.categoryService.remove(_id)
+      await channel.ack(message)
+    } catch (error) {
+      this.ack(channel, message, error)
+    }
+  }
+
   private async ack(channel: any, message: Record<string, any>, error) {
     const filter = errors.filter((code) => error.message.includes(code))
 

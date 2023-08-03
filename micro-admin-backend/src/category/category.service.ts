@@ -16,31 +16,6 @@ export class CategoryService {
 
   private readonly logger = new Logger(CategoryService.name)
 
-  // async addPlayerToCategory(params: string[]): Promise<void> {
-  //   const name = params['name']
-  //   const idPlayer = params['idPlayer']
-
-  //   const categoriaEncontrada = await this.category.findOne({ name }).exec()
-  //   const jogadorJaCadastradoCategoria = await this.category
-  //     .find({ name })
-  //     .where('players')
-  //     .in(idPlayer)
-  //     .exec()
-
-  //   await this.playerService.findById(idPlayer)
-
-  //   if (!categoriaEncontrada) {
-  //     throw new BadRequestException(`Categoria ${name} não cadastrada!`)
-  //   }
-
-  //   if (jogadorJaCadastradoCategoria.length > 0) {
-  //     throw new BadRequestException(`Jogador ${idPlayer} já cadastrado na Categoria ${name}!`)
-  //   }
-
-  //   categoriaEncontrada.players.push(idPlayer)
-  //   await this.category.findOneAndUpdate({ name }, { $set: categoriaEncontrada }).exec()
-  // }
-
   async addPlayer(name: string, idPlayer: any): Promise<void> {
     const category = await this.category.findOne({ name }).exec()
     if (!category) {
@@ -99,6 +74,15 @@ export class CategoryService {
       return await this.category.findOne(filter).populate('players').exec()
     } catch (error) {
       this.logger.error(`one error: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
+    }
+  }
+
+  async remove(_id: string): Promise<void> {
+    try {
+      await this.category.deleteOne({ _id }).exec()
+    } catch (error) {
+      this.logger.error(`error: ${JSON.stringify(error.message)}`)
       throw new RpcException(error.message)
     }
   }

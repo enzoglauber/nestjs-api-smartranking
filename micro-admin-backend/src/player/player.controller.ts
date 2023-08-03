@@ -48,7 +48,7 @@ export class PlayerController {
       await this.playerService.update(player)
       await channel.ack(message)
     } catch (error) {
-      await channel.ack(message)
+      this.ack(channel, message, error)
     }
   }
 
@@ -60,36 +60,9 @@ export class PlayerController {
       await this.playerService.remove(_id)
       await channel.ack(message)
     } catch (error) {
-      await channel.ack(message)
+      this.ack(channel, message, error)
     }
   }
-
-  // @Post()
-  // @UsePipes(ValidationPipe)
-  // async insert(@Body() player: SavePlayerDto) {
-  //   return await this.playerService.insert(player)
-  // }
-
-  // @Put('/:_id')
-  // @UsePipes(ValidationPipe)
-  // async update(@Body() player: SavePlayerDto, @Param('_id', ParamsValidationPipe) _id: string) {
-  //   return await this.playerService.update({ ...player, _id })
-  // }
-
-  // @Get()
-  // async find(): Promise<Player[] | Player> {
-  //   return await this.playerService.find()
-  // }
-
-  // @Get('/:_id')
-  // async findById(@Param('_id', ParamsValidationPipe) _id: string): Promise<Player> {
-  //   return await this.playerService.findById(_id)
-  // }
-
-  // @Delete('/:_id')
-  // async delete(@Param('_id', ParamsValidationPipe) _id: string): Promise<DeleteResult> {
-  //   return await this.playerService.remove(_id)
-  // }
 
   private async ack(channel: any, message: Record<string, any>, error) {
     const filter = errors.filter((code) => error.message.includes(code))
