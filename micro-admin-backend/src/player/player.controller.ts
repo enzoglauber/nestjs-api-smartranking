@@ -52,6 +52,18 @@ export class PlayerController {
     }
   }
 
+  @EventPattern('remove-player')
+  async remove(@Payload() _id: string, @Ctx() context: RmqContext) {
+    const channel = context.getChannelRef()
+    const message = context.getMessage()
+    try {
+      await this.playerService.remove(_id)
+      await channel.ack(message)
+    } catch (error) {
+      await channel.ack(message)
+    }
+  }
+
   // @Post()
   // @UsePipes(ValidationPipe)
   // async insert(@Body() player: SavePlayerDto) {

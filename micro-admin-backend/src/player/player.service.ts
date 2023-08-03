@@ -1,6 +1,5 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
+import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { DeleteResult } from 'mongodb'
 import { Model } from 'mongoose'
 import { SavePlayerDto } from './dtos/save-player.dto'
 import { Player } from './player.interface'
@@ -11,17 +10,6 @@ import { RpcException } from '@nestjs/microservices'
 export class PlayerService {
   constructor(@InjectModel('Player') private readonly player: Model<Player>) {}
   private readonly logger = new Logger(PlayerService.name)
-  // async save(player: SavePlayerDto): Promise<Player> {
-  //   const { _id } = player
-  //   const find = await this.find({ _id })
-
-  //   if (find) {
-  //     // throw new BadRequestException(`Player\`s email(${player.email}) already registered.`)
-  //     return await this.update(player)
-  //   } else {
-  //     return await this.insert(player)
-  //   }
-  // }
 
   async add(player: Player): Promise<void> {
     try {
@@ -33,13 +21,13 @@ export class PlayerService {
     }
   }
 
-  async remove(_id?: string): Promise<DeleteResult> {
-    const notFound = !(await this.player.findOne({ _id }).exec())
-    if (notFound) {
-      throw new NotFoundException(`Player id: ${_id} not found`)
+  async remove(_id?: string): Promise<void> {
+    try {
+      await this.player.deleteOne({ _id }).exec()
+    } catch (error) {
+      this.logger.error(`error: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
     }
-
-    return await this.player.deleteOne({ _id }).exec()
   }
 
   async find(filter?: Partial<SavePlayerDto>): Promise<Player[] | Player> {
@@ -84,17 +72,5 @@ export class PlayerService {
     }
 
     return await this.player.findOne({ _id }).exec()
-  }
-
-  async insert(player: SavePlayerDto): Promise<Player> {
-    const { email } = player
-    const find = await this.player.findOne({ email }).exec()
-
-    if (find) {
-      throw new BadRequestException(`Player's email ${email} already registered.`)
-    }
-
-    const created = new this.player(player)
-    return await created.save()
   }
 }
