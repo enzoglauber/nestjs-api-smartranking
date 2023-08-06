@@ -1,6 +1,7 @@
-import { Player } from './player.interface'
+import { Document } from 'mongoose'
+import { Player } from 'src/player/player.interface'
 
-export interface Category {
+export interface Category extends Document {
   readonly name: string
   description: string
   events: Event[]
