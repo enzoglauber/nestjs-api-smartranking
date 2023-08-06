@@ -1,44 +1,28 @@
-import { Body, Controller, Get, Param, Post, Put, UsePipes, ValidationPipe } from '@nestjs/common'
+import { Body, Controller, Get, Logger, Post, Query, UsePipes } from '@nestjs/common'
+import { ClientProxy } from '@nestjs/microservices'
+import { Observable, tap } from 'rxjs'
+import { ProxyRMQService } from 'src/proxyrmq/proxyrmq.service'
+import { ParamsValidationPipe } from 'src/shared/pipes/params-validation.pipe'
 import { Category } from './category.interface'
-import { CategoryService } from './category.service'
 import { InsertCategoryDto } from './dtos/insert-category.dto'
-import { UpdateCategoryDto } from './dtos/update-category.dto'
 @Controller('api/v1/category')
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  private client: ClientProxy
+  private logger = new Logger('micro-admin-backend')
 
-  @Post()
-  @UsePipes(ValidationPipe)
-  async add(@Body() category: InsertCategoryDto): Promise<Category> {
-    return await this.categoryService.add(category)
+  constructor(private readonly proxyRMQService: ProxyRMQService) {
+    this.client = this.proxyRMQService.get()
   }
 
-  @Get()
-  async all(@Body() category?: InsertCategoryDto): Promise<Category[]> {
-    return await this.categoryService.all(category)
+  @Post('category')
+  @UsePipes(ParamsValidationPipe)
+  add(@Body() category: InsertCategoryDto) {
+    this.client.emit('add-category', category).pipe(tap(() => this.logger.log('tap add-category')))
   }
 
-  @Get('/:name')
-  async one(@Param('name') name: string): Promise<Category> {
-    return await this.categoryService.one({ name })
+  @Get('categories')
+  all(@Query('id') id: string): Observable<Category[]> {
+    this.logger.log(`category: ${JSON.stringify(id)}`)
+    return this.client.send('all-categories', id ? id : '')
   }
-
-  @Put('/:name')
-  @UsePipes(ValidationPipe)
-  async update(@Body() category: UpdateCategoryDto, @Param('name') name: string) {
-    return await this.categoryService.update(name, category)
-  }
-
-  @Post('/:name/player/:idPlayer')
-  async addPlayer(@Param() params: string[]) {
-    const name = params['name']
-    const idPlayer = params['idPlayer']
-
-    return await this.categoryService.addPlayer(name, idPlayer)
-  }
-
-  // @Delete('/:_id')
-  // async delete(@Param('_id', UpdateCategoryDto) _id: string): Promise<DeleteResult> {
-  //   return await this.categoryService.remove(_id)
-  // }
 }
