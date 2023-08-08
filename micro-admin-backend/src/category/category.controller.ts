@@ -41,15 +41,16 @@ export class CategoryController {
   }
 
   @EventPattern('update-category')
-  async update(@Payload() data: any, @Ctx() context: RmqContext) {
+  async update(
+    @Payload() { id, category }: { id: string; category: Category },
+    @Ctx() context: RmqContext
+  ) {
     const channel = context.getChannelRef()
     const message = context.getMessage()
-    this.logger.log(`data: ${JSON.stringify(data)}`)
+    this.logger.log(`data: ${JSON.stringify({ id, category })}`)
 
     try {
-      const _id: string = data.id
-      const category: Category = data.category
-      await this.categoryService.update(_id, category)
+      await this.categoryService.update(id, category)
       await channel.ack(message)
     } catch (error) {
       this.ack(channel, message, error)

@@ -6,7 +6,7 @@ import { ParamsValidationPipe } from 'src/shared/pipes/params-validation.pipe'
 import { Category } from './category.interface'
 import { InsertCategoryDto } from './dtos/insert-category.dto'
 import { UpdateCategoryDto } from './dtos/update-category.dto'
-@Controller('api/v1/category')
+@Controller('api/v1/categories')
 export class CategoryController {
   private client: ClientProxy
   private logger = new Logger('micro-admin-backend')
@@ -15,13 +15,13 @@ export class CategoryController {
     this.client = this.proxyRMQService.get()
   }
 
-  @Post('category')
+  @Post()
   @UsePipes(ParamsValidationPipe)
   add(@Body() category: InsertCategoryDto) {
     this.client.emit('add-category', category).pipe(tap(() => this.logger.log('tap add-category')))
   }
 
-  @Get('categories')
+  @Get()
   all(@Query('id') id: string): Observable<Category[]> {
     this.logger.log(`category: ${JSON.stringify(id)}`)
     return this.client.send('all-categories', id ? id : '')

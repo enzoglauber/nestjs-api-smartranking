@@ -1,47 +1,60 @@
 import {
+  BadRequestException,
   Body,
   Controller,
-  Delete,
   Get,
+  Logger,
   Param,
   Post,
   Put,
-  UsePipes,
-  ValidationPipe
+  Query,
+  UsePipes
 } from '@nestjs/common'
-import { DeleteResult } from 'mongodb'
-import { ParamsValidationPipe } from '../shared/pipes/params-validation.pipe'
+import { ClientProxy } from '@nestjs/microservices'
+import { Observable, lastValueFrom, tap } from 'rxjs'
+import { ProxyRMQService } from 'src/proxyrmq/proxyrmq.service'
+import { ParamsValidationPipe } from 'src/shared/pipes/params-validation.pipe'
 import { SavePlayerDto } from './dtos/save-player.dto'
 import { Player } from './player.interface'
-import { PlayerService } from './player.service'
-@Controller('api/v1/player')
+@Controller('api/v1/players')
 export class PlayerController {
-  constructor(private readonly playerService: PlayerService) {}
+  private client: ClientProxy
+  private logger = new Logger('micro-admin-backend')
 
-  @Post()
-  @UsePipes(ValidationPipe)
-  async insert(@Body() player: SavePlayerDto) {
-    return await this.playerService.insert(player)
+  constructor(private readonly proxyRMQService: ProxyRMQService) {
+    this.client = this.proxyRMQService.get()
   }
 
-  @Put('/:_id')
-  @UsePipes(ValidationPipe)
-  async update(@Body() player: SavePlayerDto, @Param('_id', ParamsValidationPipe) _id: string) {
-    return await this.playerService.update({ ...player, _id })
+  @Post()
+  @UsePipes(ParamsValidationPipe)
+  async add(@Body() player: SavePlayerDto) {
+    this.logger.log(`player: ${JSON.stringify(player)}`)
+
+    try {
+      const category = await lastValueFrom(this.client.send('all-categories', player.category))
+
+      if (category) {
+        await this.client
+          .emit('add-player', player)
+          .pipe(tap(() => this.logger.log('tap add-player')))
+      }
+    } catch (error) {
+      throw new BadRequestException(`Category not registered!`)
+    }
   }
 
   @Get()
-  async find(): Promise<Player[] | Player> {
-    return await this.playerService.find()
+  all(@Query('id') id: string): Observable<Player[]> {
+    this.logger.log(`category: ${JSON.stringify(id)}`)
+    return this.client.send('all-categories', id ? id : '')
   }
 
-  @Get('/:_id')
-  async findById(@Param('_id', ParamsValidationPipe) _id: string): Promise<Player> {
-    return await this.playerService.findById(_id)
-  }
-
-  @Delete('/:_id')
-  async delete(@Param('_id', ParamsValidationPipe) _id: string): Promise<DeleteResult> {
-    return await this.playerService.remove(_id)
+  @Put('/:_id')
+  @UsePipes(ParamsValidationPipe)
+  update(@Body() player: SavePlayerDto, @Param('_id') _id: string) {
+    this.client.emit('update-player', {
+      id: _id,
+      player
+    })
   }
 }
