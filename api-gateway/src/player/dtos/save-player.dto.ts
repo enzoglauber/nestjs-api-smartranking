@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty } from 'class-validator'
+import { IsEmail, IsNotEmpty, IsOptional } from 'class-validator'
 
 export class SavePlayerDto {
   readonly _id?: string
@@ -13,4 +13,7 @@ export class SavePlayerDto {
 
   @IsNotEmpty()
   readonly category: string
+
+  @IsOptional()
+  readonly photo?: string
 }
