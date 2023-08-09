@@ -15,6 +15,10 @@ mongodb+srv://root:<password>@cluster0.qpxt5ib.mongodb.net/?retryWrites=true&w=m
 
 nest g module proxyrmq
 
+nest g module aws
+npm i @nestjs/config  --legacy-peer-deps
+npm i aws-sdk  --legacy-peer-deps
+
 nest g module challenge
 nest g controller challenge
 nest g service challenge
