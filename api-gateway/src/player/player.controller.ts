@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Logger,
   Param,
@@ -63,6 +64,11 @@ export class PlayerController {
       id: _id,
       player
     })
+  }
+
+  @Delete('/:_id')
+  async remove(@Param('_id', ParamsValidationPipe) _id: string) {
+    await this.client.emit('remove-player', { _id })
   }
 
   @Post('/:_id/upload')
