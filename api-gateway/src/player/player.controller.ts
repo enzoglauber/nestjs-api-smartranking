@@ -90,7 +90,6 @@ export class PlayerController {
       player
     })
 
-    //Retornar o jogador atualizado para o cliente
-    return this.client.send('all-players', _id)
+    return this.client.send<Player>('all-players', _id)
   }
 }

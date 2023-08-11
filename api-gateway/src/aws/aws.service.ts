@@ -30,6 +30,7 @@ export class AwsService {
     const key = `${id}.${extension}`
     const url = `https://${this.AWS_S3_BUCKET_NAME}.s3-${this.AWS_REGION}.amazonaws.com/${key}`
     this.logger.log(`urlKey: ${key}`)
+    this.logger.log(`s3: ${JSON.stringify(s3)}`)
 
     const params = {
       Body: file.buffer,
