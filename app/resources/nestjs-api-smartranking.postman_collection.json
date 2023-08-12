@@ -1,0 +1,400 @@
+{
+	"info": {
+		"_postman_id": "8fac7bf0-8acb-4fa6-9083-f2a8405c6045",
+		"name": "nestjs-api-smartranking",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1562488"
+	},
+	"item": [
+		{
+			"name": "Category",
+			"item": [
+				{
+					"name": "Insert Category",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"A\",\r\n    \"description\": \"Categoria A\",\r\n    \"events\": [\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nest_api}}/api/v1/category",
+							"host": [
+								"{{nest_api}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"category"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert Player to Category",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"A\",\r\n    \"description\": \"Categoria A\",\r\n    \"events\": [\r\n        {\r\n            \"name\": \"VITORIA\",\r\n            \"operation\": \"+\",\r\n            \"value\": 30\r\n        },\r\n        {\r\n            \"name\": \"VITORIA_LIDER\",\r\n            \"operation\": \"+\",\r\n            \"value\": 50\r\n        },\r\n        {\r\n            \"name\": \"DERROTA\",\r\n            \"operation\": \"+\",\r\n            \"value\": 0\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nest_api}}/api/v1/category/A/player/648afe1dfd406369c671229c",
+							"host": [
+								"{{nest_api}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"category",
+								"A",
+								"player",
+								"648afe1dfd406369c671229c"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Categories",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nest_api}}/api/v1/categories",
+							"host": [
+								"{{nest_api}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nest_api}}/api/v1/category/A",
+							"host": [
+								"{{nest_api}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"category",
+								"A"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Category",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"description\": \"Categoria A\",\r\n    \"events\": [\r\n        {\r\n            \"name\": \"VITORIA\",\r\n            \"operation\": \"+\",\r\n            \"value\": 30\r\n        },\r\n        {\r\n            \"name\": \"VITORIA_LIDER\",\r\n            \"operation\": \"+\",\r\n            \"value\": 50\r\n        },\r\n        {\r\n            \"name\": \"DERROTA\",\r\n            \"operation\": \"+\",\r\n            \"value\": 0\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nest_api}}/api/v1/category/:name",
+							"host": [
+								"{{nest_api}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"category",
+								":name"
+							],
+							"variable": [
+								{
+									"key": "name",
+									"value": "A"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Player",
+			"item": [
+				{
+					"name": "Save Player",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Glauber Enzo\",\r\n    \"email\": \"enzojob23@gmail.com\",\r\n    \"phone\": \"1195495077042\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nest_api}}/api/v1/players",
+							"host": [
+								"{{nest_api}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"players"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Player",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nest_api}}/api/v1/players",
+							"host": [
+								"{{nest_api}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"players"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Player byEmail",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nest_api}}/api/v1/players?email=enzojob@gmail.com",
+							"host": [
+								"{{nest_api}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"players"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "enzojob@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Player",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nest_api}}/api/v1/players/:_id",
+							"host": [
+								"{{nest_api}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"players",
+								":_id"
+							],
+							"variable": [
+								{
+									"key": "_id",
+									"value": "6472ca6802ae21135014a784"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Player",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Glauber Enzo Atualizado2\",\r\n    \"email\": \"glauber2@g.com\",\r\n    \"phone\": \"Glauber Enzo Atualizado2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{nest_api}}/api/v1/players/:_id",
+							"host": [
+								"{{nest_api}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"players",
+								":_id"
+							],
+							"variable": [
+								{
+									"key": "_id",
+									"value": "64709a162d99114508092826"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Photo",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/keepsimple.enzo/OneDrive - Unidas/Área de Trabalho/fake-face.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{nest_api}}/api/v1/players/648afe1dfd406369c671229c/upload",
+							"host": [
+								"{{nest_api}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"players",
+								"648afe1dfd406369c671229c",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "nest_api",
+			"value": "http://localhost:8080"
+		}
+	]
+}
