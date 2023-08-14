@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
 import { SavePlayerDto } from './dtos/save-player.dto'
@@ -30,14 +30,6 @@ export class PlayerService {
     }
   }
 
-  async find(filter?: Partial<SavePlayerDto>): Promise<Player[] | Player> {
-    if (filter) {
-      return await this.player.findOne({ filter }).exec()
-    } else {
-      return await this.player.find({}).exec()
-    }
-  }
-
   async all(filter: Partial<SavePlayerDto> = {}): Promise<Player[]> {
     try {
       return await this.player.find(filter).exec()
@@ -66,11 +58,11 @@ export class PlayerService {
   }
 
   async findById(_id?: string): Promise<Player> {
-    const notFound = !(await this.player.findOne({ _id }).exec())
-    if (notFound) {
-      throw new NotFoundException(`Player id: ${_id} not found`)
+    try {
+      return await this.one({ _id })
+    } catch (error) {
+      this.logger.error(`one error: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
     }
-
-    return await this.player.findOne({ _id }).exec()
   }
 }
