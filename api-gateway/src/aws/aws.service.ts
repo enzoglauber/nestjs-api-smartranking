@@ -14,11 +14,6 @@ export class AwsService {
   constructor(private configService: ConfigService) {}
 
   public async upload(file: any, id: string) {
-    // const AWS_S3_BUCKET_NAME = this.configService.get<string>('AWS_S3_BUCKET_NAME')
-    // const AWS_REGION = this.configService.get<string>('AWS_REGION')
-    // const AWS_ACCESS_KEY_ID = this.configService.get<string>('AWS_ACCESS_KEY_ID')
-    // const AWS_SECRET_ACCESS_KEY = this.configService.get<string>('AWS_SECRET_ACCESS_KEY')
-
     const s3 = new AWS.S3({
       region: this.AWS_REGION,
       accessKeyId: this.AWS_ACCESS_KEY_ID,
