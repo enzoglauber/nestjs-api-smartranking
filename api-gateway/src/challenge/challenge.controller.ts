@@ -2,8 +2,10 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   Logger,
   Post,
+  Query,
   UsePipes,
   ValidationPipe
 } from '@nestjs/common'
@@ -12,6 +14,7 @@ import { lastValueFrom } from 'rxjs'
 import { Player } from 'src/player/player.interface'
 import { ProxyRMQService } from 'src/proxyrmq/proxyrmq.service'
 import { AddChallengeDto } from './dtos/add-challenge.dto'
+import { Challenge } from './interface/challenge.interface'
 
 @Controller('api/v1/challengies')
 export class ChallengeController {
@@ -35,7 +38,7 @@ export class ChallengeController {
   }
 
   private async validatePlayers(players: Player[], category: string): Promise<void> {
-    const playersResponse = await lastValueFrom(this.admin.send('consultar-player', ''))
+    const playersResponse = await lastValueFrom(this.admin.send('all-player', ''))
 
     for (const challengePlayer of players) {
       const filter: Player[] = playersResponse.filter(
@@ -68,6 +71,25 @@ export class ChallengeController {
     if (!categoryResponse) {
       throw new BadRequestException(`Category does not exist!`)
     }
+  }
+
+  @Get()
+  async all(@Query('playerId') playerId: string): Promise<Challenge | Challenge[]> {
+    if (playerId) {
+      const player: Player = await lastValueFrom(this.admin.send('all-player', playerId))
+      this.logger.log(`player: ${JSON.stringify(player)}`)
+      if (!player) {
+        throw new BadRequestException(`Player not found!`)
+      }
+    }
+
+    /*
+      In the challenges microservice, the method responsible for querying the challenges expect the structure below, where:
+      - If we fill in the playerId, the query of challenges will be by the id of the informed player
+      - If we fill in the _id field, the query will be by the challenge id
+      - If we do not fill in any of the two fields, the query will return all registered challenges
+    */
+    return lastValueFrom(this.challenge.send('all-challenges', { playerId, _id: '' }))
   }
 
   // @Post()
