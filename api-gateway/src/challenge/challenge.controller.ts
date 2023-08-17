@@ -4,7 +4,9 @@ import {
   Controller,
   Get,
   Logger,
+  Param,
   Post,
+  Put,
   Query,
   UsePipes,
   ValidationPipe
@@ -14,7 +16,12 @@ import { lastValueFrom } from 'rxjs'
 import { Player } from 'src/player/player.interface'
 import { ProxyRMQService } from 'src/proxyrmq/proxyrmq.service'
 import { AddChallengeDto } from './dtos/add-challenge.dto'
+import { AddMatchToChallenge } from './dtos/add-match-to-challenge.dto'
+import { UpdateChallengeDto } from './dtos/update-challenge.dto'
+import { ChallengeStatus } from './enum/challenge-status.enum'
 import { Challenge } from './interface/challenge.interface'
+import { Match } from './interface/match.interface'
+import { ChallengeStatusValidationPipe } from './pipes/challenge-status-validation.pipe'
 
 @Controller('api/v1/challengies')
 export class ChallengeController {
@@ -92,36 +99,67 @@ export class ChallengeController {
     return lastValueFrom(this.challenge.send('all-challenges', { playerId, _id: '' }))
   }
 
-  // @Post()
-  // @UsePipes(ValidationPipe)
-  // async add(@Body() challenge: AddChallengeDto): Promise<Challenge> {
-  //   this.logger.log(`challenge: ${JSON.stringify(challenge)}`)
-  //   return await this.challengeService.add(challenge)
-  // }
+  @Put('/:id')
+  async update(
+    @Body(ChallengeStatusValidationPipe) challenge: UpdateChallengeDto,
+    @Param('id') _id: string
+  ) {
+    const find: Challenge = await lastValueFrom(
+      this.challenge.send('all-challenges', { playerId: '', _id })
+    )
 
-  // @Get()
-  // async search(@Query('idPlayer') _id: string): Promise<Challenge[]> {
-  //   return _id ? await this.challengeService.byIdPlayer(_id) : await this.challengeService.all()
-  // }
+    this.logger.log(`Challenge: ${JSON.stringify(find)}`)
 
-  // @Put('/:_id')
-  // async update(
-  //   @Body(ChallengeStatusValidacaoPipe) challenge: UpdateChallengeDto,
-  //   @Param('_id') _id: string
-  // ): Promise<void> {
-  //   await this.challengeService.update(_id, challenge)
-  // }
+    if (!find) {
+      throw new BadRequestException(`Challenge not found!`)
+    }
 
-  // @Post('/:_id/match/')
-  // async addChallengeMatch(
-  //   @Body(ValidationPipe) match: AddMatchToChallenge,
-  //   @Param('_id') _id: string
-  // ): Promise<void> {
-  //   return await this.challengeService.addMatch(_id, match)
-  // }
+    if (find.status != ChallengeStatus.PENDING) {
+      throw new BadRequestException('Only challenges with PENDING status can be updated!')
+    }
 
-  // @Delete('/:_id')
-  // async remove(@Param('_id') _id: string): Promise<void> {
-  //   await this.challengeService.remove(_id)
-  // }
+    await this.challenge.emit('update-challenge', { id: _id, challenge })
+  }
+
+  @Post('/:id/match/')
+  async addChallengeMatch(
+    @Body(ValidationPipe) challenge: AddMatchToChallenge,
+    @Param('id') _id: string
+  ) {
+    const find: Challenge = await lastValueFrom(
+      this.challenge.send('all-challenges', { playerId: '', _id })
+    )
+
+    this.logger.log(`Challenge: ${JSON.stringify(find)}`)
+
+    if (!find) {
+      throw new BadRequestException(`Challenge not found!`)
+    }
+
+    if (find.status == ChallengeStatus.DONE) {
+      throw new BadRequestException(`Challenge already done!`)
+    }
+
+    if (find.status != ChallengeStatus.ACCEPT) {
+      throw new BadRequestException(
+        `Matches can only be launched in challenges accepted by opponents!`
+      )
+    }
+
+    if (!find.players.includes(challenge.winner)) {
+      throw new BadRequestException(
+        `The winning player of the match must take part in the challenge!`
+      )
+    }
+
+    const match: Match = {
+      category: find.category,
+      winner: challenge.winner,
+      challenge: _id,
+      players: find.players,
+      result: challenge.result
+    }
+
+    await this.challenge.emit('add-match', match)
+  }
 }
