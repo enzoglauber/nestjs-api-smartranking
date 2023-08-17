@@ -114,7 +114,7 @@ export class ChallengeController {
       throw new BadRequestException(`Challenge not found!`)
     }
 
-    if (find.status != ChallengeStatus.PENDING) {
+    if (find.status !== ChallengeStatus.PENDING) {
       throw new BadRequestException('Only challenges with PENDING status can be updated!')
     }
 
@@ -136,11 +136,11 @@ export class ChallengeController {
       throw new BadRequestException(`Challenge not found!`)
     }
 
-    if (find.status == ChallengeStatus.DONE) {
+    if (find.status === ChallengeStatus.DONE) {
       throw new BadRequestException(`Challenge already done!`)
     }
 
-    if (find.status != ChallengeStatus.ACCEPT) {
+    if (find.status !== ChallengeStatus.ACCEPT) {
       throw new BadRequestException(
         `Matches can only be launched in challenges accepted by opponents!`
       )
