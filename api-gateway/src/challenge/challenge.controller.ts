@@ -118,7 +118,7 @@ export class ChallengeController {
       throw new BadRequestException('Only challenges with PENDING status can be updated!')
     }
 
-    await this.challenge.emit('update-challenge', { id: _id, challenge })
+    await this.challenge.emit('update-challenge', { _id, challenge })
   }
 
   @Post('/:id/match/')
