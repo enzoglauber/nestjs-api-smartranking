@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Logger,
   Param,
@@ -161,5 +162,20 @@ export class ChallengeController {
     }
 
     await this.challenge.emit('add-match', match)
+  }
+
+  @Delete('/:_id')
+  async deletarDesafio(@Param('_id') _id: string) {
+    const challenge: Challenge = await lastValueFrom(
+      this.challenge.send('all-challenges', { playerId: '', _id })
+    )
+
+    this.logger.log(`Challenge: ${JSON.stringify(challenge)}`)
+
+    if (!challenge) {
+      throw new BadRequestException(`Challenge not found!`)
+    }
+
+    await this.challenge.emit('remove-challenge', challenge)
   }
 }
