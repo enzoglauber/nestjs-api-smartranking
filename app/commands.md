@@ -29,3 +29,6 @@ npm i moment-timezone --legacy-peer-deps
 
 npm install dotenv --legacy-peer-deps
 npm install --save-dev @types/dotenv --legacy-peer-deps
+
+
+nest new micro-challenge
