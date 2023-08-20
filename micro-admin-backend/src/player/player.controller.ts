@@ -16,7 +16,7 @@ export class PlayerController {
     const channel = context.getChannelRef()
     const message = context.getMessage()
     try {
-      this.logger.log(`jogador: ${JSON.stringify(player)}`)
+      this.logger.log(`Player: ${JSON.stringify(player)}`)
       await this.playerService.add(player)
       await channel.ack(message)
     } catch (error) {
