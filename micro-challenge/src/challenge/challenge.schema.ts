@@ -6,12 +6,14 @@ export const ChallengeSchema = new mongoose.Schema(
     status: { type: String },
     request: { type: Date },
     response: { type: Date },
-    requester: { type: mongoose.Schema.Types.ObjectId, ref: 'Player' },
-    category: { type: String },
+    // requester: { type: mongoose.Schema.Types.ObjectId, ref: 'Player' },
+    requester: { type: mongoose.Schema.Types.ObjectId },
+    // category: { type: String },
+    category: { type: mongoose.Schema.Types.ObjectId },
     players: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Player'
+        type: mongoose.Schema.Types.ObjectId
+        // ref: 'Player'
       }
     ],
     match: {
