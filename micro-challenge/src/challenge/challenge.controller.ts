@@ -1,5 +1,6 @@
 import { Controller, Logger } from '@nestjs/common'
-import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices'
+import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/microservices'
+import { Types } from 'mongoose'
 import { ChallengeService } from './challenge.service'
 import { Challenge } from './interfaces/challenge.interface'
 
@@ -22,6 +23,29 @@ export class ChallengeController {
     } catch (error) {
       this.logger.log(`error: ${JSON.stringify(error.message)}`)
       this.ack(channel, message, error)
+    }
+  }
+
+  @MessagePattern('all-challenges')
+  async all(
+    @Payload() data: { playerId: Types.ObjectId; _id: Types.ObjectId },
+    @Ctx() context: RmqContext
+  ): Promise<Challenge[] | Challenge> {
+    const channel = context.getChannelRef()
+    const message = context.getMessage()
+    try {
+      const { playerId, _id } = data
+      this.logger.log(`data: ${JSON.stringify(data)}`)
+
+      if (playerId) {
+        return await this.challengeService.byPlayerId(playerId)
+      } else if (_id) {
+        return await this.challengeService.byId(_id)
+      } else {
+        return await this.challengeService.all()
+      }
+    } finally {
+      await channel.ack(message)
     }
   }
 
