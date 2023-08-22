@@ -8,6 +8,7 @@ export interface Challenge extends Document {
   response: Date
   requester: string
   category: string
+  match?: string
   players: string[] // Player[]
 }
 // TODO

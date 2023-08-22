@@ -19,8 +19,35 @@ export class ChallengeService {
       created.when = new Date()
       created.status = ChallengeStatus.PENDING
 
-      this.logger.log(`desafioCriado: ${JSON.stringify(created)}`)
+      this.logger.log(`Add Challenge: ${JSON.stringify(created)}`)
       return await created.save()
+    } catch (error) {
+      this.logger.error(`error: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
+    }
+  }
+
+  async all(): Promise<Challenge[]> {
+    try {
+      return await this.challenge.find().exec()
+    } catch (error) {
+      this.logger.error(`error: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
+    }
+  }
+
+  async byPlayerId(_id: any): Promise<Challenge[] | Challenge> {
+    try {
+      return await this.challenge.find().where('players').in(_id).exec()
+    } catch (error) {
+      this.logger.error(`error: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
+    }
+  }
+
+  async byId(_id: any): Promise<Challenge> {
+    try {
+      return await this.challenge.findOne({ _id }).exec()
     } catch (error) {
       this.logger.error(`error: ${JSON.stringify(error.message)}`)
       throw new RpcException(error.message)
