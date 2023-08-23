@@ -53,4 +53,31 @@ export class ChallengeService {
       throw new RpcException(error.message)
     }
   }
+
+  async update(_id: string, challenge: Challenge): Promise<void> {
+    try {
+      /*
+        We will update the response date when the challenge status comes filled
+      */
+      challenge.response = new Date()
+      await this.challenge.findOneAndUpdate({ _id }, { $set: challenge }).exec()
+    } catch (error) {
+      this.logger.error(`rror: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
+    }
+  }
+
+  async updateByMatch(matchId: string, challenge: Challenge): Promise<void> {
+    try {
+      /*
+        When a match is registered by a user, we will change the challenge status to DONE
+      */
+      challenge.status = ChallengeStatus.DONE
+      challenge.match = matchId
+      await this.challenge.findOneAndUpdate({ _id: challenge._id }, { $set: challenge }).exec()
+    } catch (error) {
+      this.logger.error(`error: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
+    }
+  }
 }

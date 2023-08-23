@@ -49,6 +49,41 @@ export class ChallengeController {
     }
   }
 
+  @EventPattern('update-challenge')
+  async update(
+    @Payload() { _id, challenge }: { _id: string; challenge: Challenge },
+    @Ctx() context: RmqContext
+  ) {
+    const channel = context.getChannelRef()
+    const message = context.getMessage()
+
+    try {
+      this.logger.log(`data: ${JSON.stringify({ _id, challenge })}`)
+
+      await this.challengeService.update(_id, challenge)
+      await channel.ack(message)
+    } catch (error) {
+      this.ack(channel, message, error)
+    }
+  }
+
+  @EventPattern('update-challenge-by-match')
+  async updateByMatch(
+    @Payload() { matchId, challenge }: { matchId: string; challenge: Challenge },
+    @Ctx() context: RmqContext
+  ) {
+    const channel = context.getChannelRef()
+    const message = context.getMessage()
+    try {
+      this.logger.log(`matchId: ${matchId}`)
+
+      await this.challengeService.updateByMatch(matchId, challenge)
+      await channel.ack(message)
+    } catch (error) {
+      this.ack(channel, message, error)
+    }
+  }
+
   private async ack(channel: any, message: Record<string, any>, error) {
     const filter = errors.filter((code) => error.message.includes(code))
 
