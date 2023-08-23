@@ -80,4 +80,20 @@ export class ChallengeService {
       throw new RpcException(error.message)
     }
   }
+
+  async remove({ _id, ...challenge }: Challenge): Promise<void> {
+    try {
+      /*
+        We will carry out the logical deletion of the challenge, modifying its status to
+        CANCELED
+      */
+      challenge.status = ChallengeStatus.CANCELED
+      this.logger.log(`Challenge: ${JSON.stringify({ _id, challenge })}`)
+
+      await this.challenge.findOneAndUpdate({ _id }, { $set: challenge }).exec()
+    } catch (error) {
+      this.logger.error(`error: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
+    }
+  }
 }
