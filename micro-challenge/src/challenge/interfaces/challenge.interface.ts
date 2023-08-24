@@ -11,14 +11,3 @@ export interface Challenge extends Document {
   match?: string
   players: string[] // Player[]
 }
-// TODO
-// export interface Match extends Document {
-//   category: string
-//   players: Player[]
-//   winner: Player
-//   result: Result[]
-// }
-
-// export interface Result {
-//   set: string
-// }

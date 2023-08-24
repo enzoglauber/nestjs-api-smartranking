@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
 import { ChallengeModule } from './challenge/challenge.module'
+import { MatchModule } from './match/match.module'
 import { ProxyRMQModule } from './proxyrmq/proxyrmq.module'
 
 @Module({
@@ -18,7 +19,8 @@ import { ProxyRMQModule } from './proxyrmq/proxyrmq.module'
     }),
 
     ChallengeModule,
-    ProxyRMQModule
+    ProxyRMQModule,
+    MatchModule
   ],
   controllers: [],
   providers: []
