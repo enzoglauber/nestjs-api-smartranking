@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common'
 import { RpcException } from '@nestjs/microservices'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
-import { AddChallengeDto } from './dtos/add-challenge.dto'
 import { ChallengeStatus } from './interfaces/challenge-status.enum'
 import { Challenge } from './interfaces/challenge.interface'
 
@@ -12,7 +11,7 @@ export class ChallengeService {
 
   private readonly logger = new Logger(ChallengeService.name)
 
-  async add(challenge: AddChallengeDto): Promise<Challenge> {
+  async add(challenge: Challenge): Promise<Challenge> {
     try {
       const created = new this.challenge(challenge)
 
