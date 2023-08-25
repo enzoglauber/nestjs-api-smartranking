@@ -35,3 +35,6 @@ nest new micro-challenge
 
 npm install @nestjs/microservices amqplib amqp-connection-manager @nestjs/mongoose mongoose @nestjs/config  --legacy-peer-deps
 npm install --dev @types/mongoose 
+
+
+nest g resource match
