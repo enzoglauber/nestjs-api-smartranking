@@ -1,0 +1,23 @@
+/*
+/rankings/[idCategoria]
+*/
+[{
+	"jogador":"5f0a0ca820e9f0219c9e6492",
+	"posicao": 1,
+	"pontuacao":150,
+	"historicoPartidas": {
+		"vitorias": 7,
+		"derrotas": 1
+	}
+},
+{
+	"jogador":"5f0a104395d640224785d45e",
+	"posicao": 2,
+	"pontuacao":80,
+	"historicoPartidas": {
+		"vitorias": 2,
+		"derrotas": 3
+	}
+}
+]
+

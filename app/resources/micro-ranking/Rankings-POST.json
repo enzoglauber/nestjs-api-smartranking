@@ -1,0 +1,28 @@
+[{
+	"desafio":"",
+	"partida":"",
+	"categoria": "5f0a0c0e20e9f0219c9e6486",
+	"jogador":"5f0a0ca820e9f0219c9e6492",
+	"evento":"VITORIA",
+	"operacao":"+",
+	"pontos":30
+},
+{
+	"desafio":"",
+	"partida":"",
+	"categoria": "5f0a0c0e20e9f0219c9e6486",
+	"jogador":"5f0a0ca820e9f0219c9e6492",
+	"evento":"VITORIA",
+	"operacao":"+",
+	"pontos":30
+},
+{
+	"desafio":"",
+	"partida":"",
+	"categoria": "5f0a0c0e20e9f0219c9e6486",
+	"jogador":"5f0a0ca820e9f0219c9e6492",
+	"evento":"DERROTA",
+	"operacao":"+",
+	"pontos":0
+}
+]
