@@ -11,6 +11,7 @@ import { Match } from './match.interface'
 export class MatchService {
   private readonly logger = new Logger(MatchService.name)
   private readonly challengeRMQ = this.proxyRMQService.get(`challenges`)
+  private readonly rankingRMQ = this.proxyRMQService.get(`rankings`)
 
   constructor(
     @InjectModel('Match') private readonly match: Model<Match>,
@@ -40,9 +41,15 @@ export class MatchService {
         We activated the topic 'update-challenge-match' which will be
         responsible for updating the challenge.
       */
-      return await lastValueFrom(
+      await lastValueFrom(
         this.challengeRMQ.emit('update-challenge-by-match', { matchId, challenge })
       )
+
+      /*
+        We send the match to the rankings microservice,
+        indicating the need to process this item
+      */
+      return await lastValueFrom(this.rankingRMQ.emit('process-match', { matchId, challenge }))
     } catch (error) {
       this.logger.error(`error: ${JSON.stringify(error.message)}`)
       throw new RpcException(error.message)
