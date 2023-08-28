@@ -38,3 +38,7 @@ npm install --dev @types/mongoose
 
 
 nest g resource match
+
+
+
+nest new micro-rankings
