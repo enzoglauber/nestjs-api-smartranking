@@ -49,7 +49,7 @@ export class MatchService {
         We send the match to the rankings microservice,
         indicating the need to process this item
       */
-      return await lastValueFrom(this.rankingRMQ.emit('process-match', { matchId, challenge }))
+      return await lastValueFrom(this.rankingRMQ.emit('process-match', { matchId, match }))
     } catch (error) {
       this.logger.error(`error: ${JSON.stringify(error.message)}`)
       throw new RpcException(error.message)

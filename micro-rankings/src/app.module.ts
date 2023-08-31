@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MongooseModule } from '@nestjs/mongoose'
+import { ProxyRMQModule } from './proxyrmq/proxyrmq.module'
 import { RankingModule } from './ranking/ranking.module'
 
 @Module({
@@ -17,7 +18,8 @@ import { RankingModule } from './ranking/ranking.module'
       }),
       inject: [ConfigService]
     }),
-    RankingModule
+    RankingModule,
+    ProxyRMQModule
   ],
   controllers: [],
   providers: []

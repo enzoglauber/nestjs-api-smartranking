@@ -1,4 +1,4 @@
-import { ChallengeStatus } from 'src/challenge/interfaces/challenge-status.enum'
+import { ChallengeStatus } from './challenge-status.enum'
 
 export interface Challenge {
   when: Date
@@ -8,5 +8,5 @@ export interface Challenge {
   requester: string
   category: string
   match?: string
-  players: string[] // Player[]
+  players: string[]
 }

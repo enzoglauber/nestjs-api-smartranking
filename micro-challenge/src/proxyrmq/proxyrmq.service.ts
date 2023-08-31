@@ -3,7 +3,7 @@ import { ClientProxy, ClientProxyFactory, Transport } from '@nestjs/microservice
 
 @Injectable()
 export class ProxyRMQService {
-  get(queue: string = 'admin-backend'): ClientProxy {
+  get(queue = 'admin-backend'): ClientProxy {
     return ClientProxyFactory.create({
       transport: Transport.RMQ,
       options: {
