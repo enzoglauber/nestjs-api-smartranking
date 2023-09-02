@@ -27,7 +27,6 @@ export class RankingService {
 
       const createRankingEntry = async (player: string, isWinner: boolean): Promise<void> => {
         const event = isWinner ? EventEnum.VICTORY : EventEnum.DEFEAT
-
         const filter = category.events.find(({ name }) => name === event)
 
         if (!filter) {
