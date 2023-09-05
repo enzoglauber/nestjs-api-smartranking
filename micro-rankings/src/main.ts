@@ -1,7 +1,9 @@
 import { Logger } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { MicroserviceOptions, Transport } from '@nestjs/microservices'
+import * as moment from 'moment-timezone'
 import { AppModule } from './app.module'
+
 const logger = new Logger('micro-rankings')
 
 async function bootstrap() {
@@ -15,6 +17,11 @@ async function bootstrap() {
       queue: 'rankings'
     }
   })
+
+  Date.prototype.toJSON = function (): string {
+    return moment(this).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss.SSS')
+  }
+
   await app.listen()
   logger.log('Rankings service is listening')
 }
