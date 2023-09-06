@@ -6,6 +6,7 @@ import { ChallengeModule } from './challenge/challenge.module'
 import { PlayerModule } from './player/player.module'
 import { ProxyRMQModule } from './proxyrmq/proxyrmq.module'
 import { ProxyRMQService } from './proxyrmq/proxyrmq.service'
+import { RankingModule } from './ranking/ranking.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { ProxyRMQService } from './proxyrmq/proxyrmq.service'
     PlayerModule,
     CategoryModule,
     ChallengeModule,
-    ConfigModule.forRoot({ isGlobal: true })
+    ConfigModule.forRoot({ isGlobal: true }),
+    RankingModule
   ],
   controllers: [],
   providers: [ProxyRMQService]
