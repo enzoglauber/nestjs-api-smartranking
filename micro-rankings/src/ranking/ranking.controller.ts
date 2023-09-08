@@ -1,5 +1,6 @@
 import { Controller, Logger } from '@nestjs/common'
-import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices'
+import { Ctx, EventPattern, MessagePattern, Payload, RmqContext } from '@nestjs/microservices'
+import { RankingResponse } from 'src/shared/interfaces/ranking-response.interface'
 import { Match } from '../shared/interfaces/match.interface'
 import { RankingService } from './ranking.service'
 
@@ -32,6 +33,28 @@ export class RankingController {
     } catch (error) {
       this.logger.log(`error: ${JSON.stringify(error.message)}`)
       this.ack(channel, message, error)
+    }
+  }
+
+  @MessagePattern('all-rankings')
+  async all(
+    @Payload()
+    {
+      categoryId,
+      date
+    }: {
+      categoryId: string
+      date: string
+    },
+    @Ctx() context: RmqContext
+  ): Promise<RankingResponse[] | RankingResponse> {
+    const channel = context.getChannelRef()
+    const message = context.getMessage()
+
+    try {
+      return await this.rankingService.all(categoryId, date)
+    } finally {
+      await channel.ack(message)
     }
   }
 

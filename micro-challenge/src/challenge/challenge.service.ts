@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { RpcException } from '@nestjs/microservices'
 import { InjectModel } from '@nestjs/mongoose'
+import * as moment from 'moment-timezone'
 import { Model } from 'mongoose'
 import { ChallengeStatus } from './interfaces/challenge-status.enum'
 import { Challenge } from './interfaces/challenge.interface'
@@ -90,6 +91,25 @@ export class ChallengeService {
       this.logger.log(`Challenge: ${JSON.stringify({ _id, challenge })}`)
 
       await this.challenge.findOneAndUpdate({ _id }, { $set: challenge }).exec()
+    } catch (error) {
+      this.logger.error(`error: ${JSON.stringify(error.message)}`)
+      throw new RpcException(error.message)
+    }
+  }
+
+  async findByDate(categoryId: string, date: string): Promise<Challenge[]> {
+    try {
+      const when = moment(`${date} 23:59:59.999`).tz('UTC').toDate().getTime()
+
+      return await this.challenge
+        .find()
+        .where('category')
+        .equals(categoryId)
+        .where('status')
+        .equals(ChallengeStatus.DONE)
+        .where('when')
+        .lte(when)
+        .exec()
     } catch (error) {
       this.logger.error(`error: ${JSON.stringify(error.message)}`)
       throw new RpcException(error.message)
