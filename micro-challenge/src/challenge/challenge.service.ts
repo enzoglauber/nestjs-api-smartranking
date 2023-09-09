@@ -100,7 +100,6 @@ export class ChallengeService {
   async findByDate(categoryId: string, date: string): Promise<Challenge[]> {
     try {
       const when = moment(`${date} 23:59:59.999`).tz('UTC').toDate().getTime()
-
       return await this.challenge
         .find()
         .where('category')
