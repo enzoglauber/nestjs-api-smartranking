@@ -42,3 +42,7 @@ nest g resource match
 
 nest new micro-rankings
 npm install @nestjs/microservices amqplib amqp-connection-manager @nestjs/mongoose mongoose @nestjs/config  --legacy-peer-deps
+
+
+nest new micro-notification
+npm install @nestjs/microservices amqplib amqp-connection-manager @nestjs/config  --legacy-peer-deps
