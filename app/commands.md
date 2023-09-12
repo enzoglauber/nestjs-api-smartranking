@@ -45,4 +45,5 @@ npm install @nestjs/microservices amqplib amqp-connection-manager @nestjs/mongoo
 
 
 nest new micro-notification
-npm install @nestjs/microservices amqplib amqp-connection-manager @nestjs/config  --legacy-peer-deps
+npm install @nestjs/microservices amqplib amqp-connection-manager @nestjs/config --legacy-peer-deps
+npm install @nestjs-modules/mailer nodemailer --legacy-peer-deps  
