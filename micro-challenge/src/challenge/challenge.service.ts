@@ -3,12 +3,18 @@ import { RpcException } from '@nestjs/microservices'
 import { InjectModel } from '@nestjs/mongoose'
 import * as moment from 'moment-timezone'
 import { Model } from 'mongoose'
+import { lastValueFrom } from 'rxjs'
+import { ProxyRMQService } from 'src/proxyrmq/proxyrmq.service'
 import { ChallengeStatus } from './interfaces/challenge-status.enum'
 import { Challenge } from './interfaces/challenge.interface'
 
 @Injectable()
 export class ChallengeService {
-  constructor(@InjectModel('Challenge') private readonly challenge: Model<Challenge>) {}
+  private readonly notificationRMQ = this.proxyRMQService.get(`notifications`)
+  constructor(
+    @InjectModel('Challenge') private readonly challenge: Model<Challenge>,
+    private readonly proxyRMQService: ProxyRMQService
+  ) {}
 
   private readonly logger = new Logger(ChallengeService.name)
 
@@ -20,7 +26,9 @@ export class ChallengeService {
       created.status = ChallengeStatus.PENDING
 
       this.logger.log(`Add Challenge: ${JSON.stringify(created)}`)
-      return await created.save()
+      await created.save()
+
+      return await lastValueFrom(this.notificationRMQ.emit('notification-new-challenge', challenge))
     } catch (error) {
       this.logger.error(`error: ${JSON.stringify(error.message)}`)
       throw new RpcException(error.message)

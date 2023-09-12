@@ -1,6 +1,8 @@
 import { MailerModule } from '@nestjs-modules/mailer'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
 import { ProxyRMQModule } from './proxyrmq/proxyrmq.module'
 
 @Module({
@@ -44,7 +46,7 @@ import { ProxyRMQModule } from './proxyrmq/proxyrmq.module'
     }),
     ProxyRMQModule
   ],
-  controllers: [],
-  providers: []
+  controllers: [AppController],
+  providers: [AppService]
 })
 export class AppModule {}

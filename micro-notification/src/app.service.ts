@@ -19,7 +19,7 @@ export class AppService {
   private readonly adminRMQ = this.proxyRMQService.get(`admin-backend`)
   private readonly logger = new Logger(AppService.name)
 
-  async email(challenge: Challenge): Promise<void> {
+  async notification(challenge: Challenge): Promise<void> {
     try {
       const [opponentId, requesterId] = challenge.players.filter(
         (player) => player !== challenge.requester
