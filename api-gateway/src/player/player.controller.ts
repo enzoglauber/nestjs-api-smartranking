@@ -48,13 +48,13 @@ export class PlayerController {
 
   @Put('/:_id')
   @UsePipes(ParamsValidationPipe)
-  async update(@Body() player: Player, @Param('_id') _id: string) {
+  async update(@Body() player: Player, @Param('_id') _id: string): Promise<void> {
     await this.playerService.update({ ...player, _id })
   }
 
   @Delete('/:_id')
-  async remove(@Param('_id', ParamsValidationPipe) _id: string) {
-    await this.client.emit('remove-player', { _id })
+  async remove(@Param('_id', ParamsValidationPipe) _id: string): Promise<void> {
+    await this.playerService.remove(_id)
   }
 
   @Post('/:_id/upload')

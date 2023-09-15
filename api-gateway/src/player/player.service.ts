@@ -33,9 +33,13 @@ export class PlayerService {
     )
 
     if (category) {
-      await this.adminRMQ.emit('update-player', player)
+      return await lastValueFrom<void>(this.adminRMQ.emit('update-player', player))
     } else {
       throw new BadRequestException(`Category not registered!`)
     }
+  }
+
+  async remove(_id: string): Promise<void> {
+    return await lastValueFrom<void>(this.adminRMQ.emit('remove-player', _id))
   }
 }
