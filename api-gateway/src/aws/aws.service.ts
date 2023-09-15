@@ -13,7 +13,7 @@ export class AwsService {
 
   constructor(private configService: ConfigService) {}
 
-  public async upload(file: any, id: string) {
+  async upload(file: Express.Multer.File, id: string): Promise<string> {
     const s3 = new AWS.S3({
       region: this.AWS_REGION,
       accessKeyId: this.AWS_ACCESS_KEY_ID,
@@ -33,15 +33,12 @@ export class AwsService {
       Key: key
     }
 
-    return s3
-      .putObject(params)
-      .promise()
-      .then(
-        () => ({ url }),
-        (err) => {
-          this.logger.error(err)
-          return err
-        }
-      )
+    try {
+      await s3.putObject(params).promise()
+      return url
+    } catch (err) {
+      this.logger.error(err)
+      throw err
+    }
   }
 }
