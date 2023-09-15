@@ -15,12 +15,13 @@ import {
 } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { Observable, lastValueFrom, tap } from 'rxjs'
+import { lastValueFrom } from 'rxjs'
 import { AwsService } from 'src/aws/aws.service'
 import { ProxyRMQService } from 'src/proxyrmq/proxyrmq.service'
 import { ParamsValidationPipe } from 'src/shared/pipes/params-validation.pipe'
 import { SavePlayerDto } from './dtos/save-player.dto'
 import { Player } from './player.interface'
+import { PlayerService } from './player.service'
 @Controller('api/v1/players')
 export class PlayerController {
   private client: ClientProxy
@@ -28,7 +29,8 @@ export class PlayerController {
 
   constructor(
     private readonly proxyRMQService: ProxyRMQService,
-    private readonly awsService: AwsService
+    private readonly awsService: AwsService,
+    private readonly playerService: PlayerService
   ) {
     this.client = this.proxyRMQService.get()
   }
@@ -36,34 +38,18 @@ export class PlayerController {
   @Post()
   @UsePipes(ParamsValidationPipe)
   async add(@Body() player: SavePlayerDto) {
-    this.logger.log(`player: ${JSON.stringify(player)}`)
-
-    try {
-      const category = await lastValueFrom(this.client.send('all-categories', player.category))
-
-      if (category) {
-        await this.client
-          .emit('add-player', player)
-          .pipe(tap(() => this.logger.log('tap add-player')))
-      }
-    } catch (error) {
-      throw new BadRequestException(`Category not registered!`)
-    }
+    this.playerService.add(player)
   }
 
   @Get()
-  all(@Query('id') id: string): Observable<Player[]> {
-    this.logger.log(`category: ${JSON.stringify(id)}`)
-    return this.client.send('all-categories', id ? id : '')
+  async all(@Query('id') id: string): Promise<Player[]> {
+    return await this.playerService.all(id)
   }
 
   @Put('/:_id')
   @UsePipes(ParamsValidationPipe)
-  update(@Body() player: SavePlayerDto, @Param('_id') _id: string) {
-    this.client.emit('update-player', {
-      id: _id,
-      player
-    })
+  async update(@Body() player: Player, @Param('_id') _id: string) {
+    await this.playerService.update({ ...player, _id })
   }
 
   @Delete('/:_id')
@@ -85,10 +71,7 @@ export class PlayerController {
     const photo = await this.awsService.upload(file, _id)
     player.photo = photo.url
 
-    await this.client.emit('update-player', {
-      id: _id,
-      player
-    })
+    await this.playerService.update({ ...player, _id })
 
     return this.client.send<Player>('all-players', _id)
   }
