@@ -165,7 +165,7 @@ export class ChallengeController {
   }
 
   @Delete('/:_id')
-  async deletarDesafio(@Param('_id') _id: string) {
+  async remove(@Param('_id') _id: string) {
     const challenge: Challenge = await lastValueFrom(
       this.challenge.send('all-challenges', { playerId: '', _id })
     )
