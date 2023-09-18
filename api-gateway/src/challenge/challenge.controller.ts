@@ -16,6 +16,7 @@ import { ClientProxy } from '@nestjs/microservices'
 import { lastValueFrom } from 'rxjs'
 import { Player } from 'src/player/player.interface'
 import { ProxyRMQService } from 'src/proxyrmq/proxyrmq.service'
+import { ChallengeService } from './challenge.service'
 import { AddChallengeDto } from './dtos/add-challenge.dto'
 import { AddMatchToChallenge } from './dtos/add-match-to-challenge.dto'
 import { UpdateChallengeDto } from './dtos/update-challenge.dto'
@@ -31,18 +32,16 @@ export class ChallengeController {
 
   private logger = new Logger('micro-admin-backend')
 
-  constructor(private readonly proxyRMQService: ProxyRMQService) {}
+  constructor(
+    private readonly proxyRMQService: ProxyRMQService,
+    private readonly challengeService: ChallengeService
+  ) {}
 
   @Post()
   @UsePipes(ValidationPipe)
-  async add(@Body() addChallenge: AddChallengeDto) {
-    this.logger.log(`addChallenge: ${JSON.stringify(addChallenge)}`)
-
-    await this.validatePlayers(addChallenge.players, addChallenge.category)
-    await this.validateRequester(addChallenge.players, addChallenge.requester)
-    await this.validateCategory(addChallenge.category)
-
-    await this.challenge.emit('add-challenge', addChallenge)
+  async add(@Body() challenge: AddChallengeDto): Promise<void> {
+    this.logger.log(`addChallenge: ${JSON.stringify(challenge)}`)
+    return await this.challengeService.add(challenge)
   }
 
   private async validatePlayers(players: Player[], category: string): Promise<void> {
