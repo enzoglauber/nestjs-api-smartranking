@@ -7,6 +7,7 @@ import { PlayerModule } from './player/player.module'
 import { ProxyRMQModule } from './proxyrmq/proxyrmq.module'
 import { ProxyRMQService } from './proxyrmq/proxyrmq.service'
 import { RankingModule } from './ranking/ranking.module'
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { RankingModule } from './ranking/ranking.module'
     PlayerModule,
     CategoryModule,
     ChallengeModule,
-    RankingModule
+    RankingModule,
+    AuthModule
   ],
   controllers: [],
   providers: [ProxyRMQService]
