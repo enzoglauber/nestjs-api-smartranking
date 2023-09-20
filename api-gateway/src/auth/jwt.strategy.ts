@@ -2,24 +2,24 @@ import { Injectable, Logger } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import { passportJwtSecret } from 'jwks-rsa'
 import { ExtractJwt, Strategy } from 'passport-jwt'
-import { AwsCognitoConfig } from '../aws/aws-cognito.config'
+import { CognitoService } from 'src/aws/cognito/cognito.service'
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   private logger = new Logger(JwtStrategy.name)
 
-  constructor(private authConfig: AwsCognitoConfig) {
+  constructor(private readonly cognitoService: CognitoService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      audience: authConfig.clientId,
-      issuer: authConfig.authority,
+      audience: cognitoService.CLIENT_ID,
+      issuer: cognitoService.AUTHORITY,
       algorithms: ['RS256'],
       secretOrKeyProvider: passportJwtSecret({
         cache: true,
         rateLimit: true,
         jwksRequestsPerMinute: 5,
-        jwksUri: `${authConfig.authority}/.well-known/jwks.json`
+        jwksUri: `${cognitoService.AUTHORITY}/.well-known/jwks.json`
       })
     })
   }
