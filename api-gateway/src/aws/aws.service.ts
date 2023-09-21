@@ -4,10 +4,10 @@ import * as AWS from 'aws-sdk'
 
 @Injectable()
 export class AwsService {
-  AWS_S3_BUCKET_NAME = this.configService.get<string>('AWS_S3_BUCKET_NAME')
-  AWS_REGION = this.configService.get<string>('AWS_REGION')
-  AWS_ACCESS_KEY_ID = this.configService.get<string>('AWS_ACCESS_KEY_ID')
-  AWS_SECRET_ACCESS_KEY = this.configService.get<string>('AWS_SECRET_ACCESS_KEY')
+  readonly AWS_S3_BUCKET_NAME = this.configService.get<string>('AWS_S3_BUCKET_NAME')
+  readonly AWS_S3_REGION = this.configService.get<string>('AWS_S3_REGION')
+  readonly AWS_S3_ACCESS_KEY_ID = this.configService.get<string>('AWS_S3_ACCESS_KEY_ID')
+  readonly AWS_S3_SECRET_ACCESS_KEY = this.configService.get<string>('AWS_S3_SECRET_ACCESS_KEY')
 
   private logger = new Logger(AwsService.name)
 
@@ -15,15 +15,15 @@ export class AwsService {
 
   async upload(file: Express.Multer.File, id: string): Promise<string> {
     const s3 = new AWS.S3({
-      region: this.AWS_REGION,
-      accessKeyId: this.AWS_ACCESS_KEY_ID,
-      secretAccessKey: this.AWS_SECRET_ACCESS_KEY
+      region: this.AWS_S3_REGION,
+      accessKeyId: this.AWS_S3_ACCESS_KEY_ID,
+      secretAccessKey: this.AWS_S3_SECRET_ACCESS_KEY
     })
 
     const extension = file.originalname.split('.')[1]
     //png
     const key = `${id}.${extension}`
-    const url = `https://${this.AWS_S3_BUCKET_NAME}.s3-${this.AWS_REGION}.amazonaws.com/${key}`
+    const url = `https://${this.AWS_S3_BUCKET_NAME}.s3-${this.AWS_S3_REGION}.amazonaws.com/${key}`
     this.logger.log(`urlKey: ${key}`)
     this.logger.log(`s3: ${JSON.stringify(s3)}`)
 

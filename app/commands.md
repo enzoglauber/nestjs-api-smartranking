@@ -7,6 +7,10 @@ npm i @nestjs/mongoose mongoose
 npm i class-validator class-transformer
 npm i -D @types/multer
 
+  npm i amazon-cognito-identity-js @nestjs/passport jwks-rsa passport passport-jwt --legacy-peer-deps
+  npm i @types/passport-jwt -D --legacy-peer-deps
+    
+
 nest g module player
 nest g controller player
 nest g service player
