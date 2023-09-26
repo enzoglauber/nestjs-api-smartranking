@@ -58,3 +58,13 @@ SCP Application Runtime links:
   https://docs.cloudfoundry.org/cf-cli/
   https://accounts.sap.com/saml2/idp/sso?sp=cockpit-trial-cf-eu10&RelayState=response_type%3Dcode%26scope%3Dopenid%26redirect_uri%3Dhttps%253A%252F%252Faccount.hanatrial.ondemand.com%252Flogin%252Fcallback%26client_id%3D9868c363-bc2d-407f-bc14-2ef649230f6f%26state%3D1714564424247
   https://developers.sap.com/tutorials/hcp-create-trial-account.html
+
+
+setar a api
+  cf login -a {{API_ENDPOINT}}
+entrar com email e senha
+
+deploy:
+  cf push
+
+definir as variaveis de ambiente no cloud plataform
