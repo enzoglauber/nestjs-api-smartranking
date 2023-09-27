@@ -7,6 +7,7 @@ import {
   CognitoUserPool,
   CognitoUserSession
 } from 'amazon-cognito-identity-js'
+import { ChangePasswordAuthDto } from 'src/auth/dto/change-password-auth.dto'
 import { LoginAuthDto } from 'src/auth/dto/login-auth.dto'
 import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto'
 
@@ -63,6 +64,39 @@ export class CognitoService {
         },
         onFailure: (err) => {
           reject(new Error(`Login failed: ${err.message}`))
+        }
+      })
+    })
+  }
+
+  async changePassword(auth: ChangePasswordAuthDto) {
+    const { email, password, newPassword } = auth
+
+    const userData = {
+      Username: email,
+      Pool: this.userPool
+    }
+
+    const details = new AuthenticationDetails({
+      Username: email,
+      Password: password
+    })
+
+    const user = new CognitoUser(userData)
+
+    return new Promise((resolve, reject) => {
+      user.authenticateUser(details, {
+        onSuccess: () => {
+          user.changePassword(password, newPassword, (err, result) => {
+            if (err) {
+              reject(err)
+              return
+            }
+            resolve(result)
+          })
+        },
+        onFailure: (err) => {
+          reject(err)
         }
       })
     })
