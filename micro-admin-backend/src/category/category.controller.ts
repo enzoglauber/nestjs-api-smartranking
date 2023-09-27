@@ -22,6 +22,8 @@ export class CategoryController {
     } catch (error) {
       this.logger.error(`error: ${JSON.stringify(error.message)}`)
       this.ack(channel, message, error)
+
+      await channel.nack(message)
     }
   }
 
@@ -54,6 +56,7 @@ export class CategoryController {
       await channel.ack(message)
     } catch (error) {
       this.ack(channel, message, error)
+      await channel.nack(message)
     }
   }
 
@@ -66,6 +69,7 @@ export class CategoryController {
       await channel.ack(message)
     } catch (error) {
       this.ack(channel, message, error)
+      await channel.nack(message)
     }
   }
 
@@ -75,5 +79,7 @@ export class CategoryController {
     if (filter.length) {
       await channel.ack(message)
     }
+
+    return
   }
 }

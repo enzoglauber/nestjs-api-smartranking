@@ -33,6 +33,7 @@ export class RankingController {
     } catch (error) {
       this.logger.log(`error: ${JSON.stringify(error.message)}`)
       this.ack(channel, message, error)
+      await channel.nack(message)
     }
   }
 
@@ -64,5 +65,6 @@ export class RankingController {
     if (filter.length) {
       await channel.ack(message)
     }
+    return
   }
 }
