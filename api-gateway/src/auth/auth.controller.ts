@@ -1,6 +1,7 @@
 import { Body, Controller, Post, UsePipes, ValidationPipe } from '@nestjs/common'
 import { CognitoService } from 'src/aws/cognito/cognito.service'
 import { ChangePasswordAuthDto } from './dto/change-password-auth.dto'
+import { ForgotPasswordAuthDto } from './dto/forgot-password-auth.dto copy'
 import { LoginAuthDto } from './dto/login-auth.dto'
 import { RegisterAuthDto } from './dto/register-auth.dto'
 
@@ -28,5 +29,11 @@ export class AuthController {
     return {
       status
     }
+  }
+
+  @Post('/forgot-password')
+  @UsePipes(ValidationPipe)
+  async forgotPassword(@Body() auth: ForgotPasswordAuthDto) {
+    return await this.cognitoService.forgotPassword(auth)
   }
 }

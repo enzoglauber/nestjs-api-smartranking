@@ -8,6 +8,7 @@ import {
   CognitoUserSession
 } from 'amazon-cognito-identity-js'
 import { ChangePasswordAuthDto } from 'src/auth/dto/change-password-auth.dto'
+import { ForgotPasswordAuthDto } from 'src/auth/dto/forgot-password-auth.dto copy'
 import { LoginAuthDto } from 'src/auth/dto/login-auth.dto'
 import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto'
 
@@ -93,6 +94,52 @@ export class CognitoService {
               return
             }
             resolve(result)
+          })
+        },
+        onFailure: (err) => {
+          reject(err)
+        }
+      })
+    })
+  }
+
+  async forgotPassword(auth: ForgotPasswordAuthDto) {
+    const { email } = auth
+
+    const data = {
+      Username: email,
+      Pool: this.userPool
+    }
+
+    const user = new CognitoUser(data)
+
+    return new Promise((resolve, reject) => {
+      user.forgotPassword({
+        onSuccess: (result) => {
+          resolve(result)
+        },
+        onFailure: (err) => {
+          reject(err)
+        }
+      })
+    })
+  }
+
+  async confirmarSenhaUsuario(authConfirmarSenhaUsuarioDto: AuthConfirmarSenhaUsuarioDto) {
+    const { email, codigoConfirmacao, novaSenha } = authConfirmarSenhaUsuarioDto
+
+    const userData = {
+      Username: email,
+      Pool: this.userPool
+    }
+
+    const cognitoUser = new CognitoUser(userData)
+
+    return new Promise((resolve, reject) => {
+      cognitoUser.confirmPassword(codigoConfirmacao, novaSenha, {
+        onSuccess: () => {
+          resolve({
+            status: 'sucesso'
           })
         },
         onFailure: (err) => {
