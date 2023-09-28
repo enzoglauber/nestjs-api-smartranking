@@ -7,8 +7,10 @@ import {
   CognitoUserPool,
   CognitoUserSession
 } from 'amazon-cognito-identity-js'
+import * as AWS from 'aws-sdk'
 import { ChangePasswordAuthDto } from 'src/auth/dto/change-password-auth.dto'
-import { ForgotPasswordAuthDto } from 'src/auth/dto/forgot-password-auth.dto copy'
+import { ConfirmPasswordAuthDto } from 'src/auth/dto/confirm-password-auth.dto'
+import { ForgotPasswordAuthDto } from 'src/auth/dto/forgot-password-auth.dto'
 import { LoginAuthDto } from 'src/auth/dto/login-auth.dto'
 import { RegisterAuthDto } from 'src/auth/dto/register-auth.dto'
 
@@ -18,6 +20,11 @@ export class CognitoService {
   readonly CLIENT_ID = this.configService.get<string>('COGNITO_CLIENT_ID')
   readonly REGION = this.configService.get<string>('COGNITO_REGION')
   readonly AUTHORITY = `https://cognito-idp.${this.REGION}.amazonaws.com/${this.USER_POOL_ID}`
+  //
+  readonly AWS_S3_REGION = this.configService.get<string>('AWS_S3_REGION')
+  readonly AWS_S3_ACCESS_KEY_ID = this.configService.get<string>('AWS_S3_ACCESS_KEY_ID')
+  readonly AWS_S3_SECRET_ACCESS_KEY = this.configService.get<string>('AWS_S3_SECRET_ACCESS_KEY')
+
   private readonly userPool: CognitoUserPool = new CognitoUserPool({
     UserPoolId: this.USER_POOL_ID,
     ClientId: this.CLIENT_ID
@@ -125,25 +132,51 @@ export class CognitoService {
     })
   }
 
-  async confirmarSenhaUsuario(authConfirmarSenhaUsuarioDto: AuthConfirmarSenhaUsuarioDto) {
-    const { email, codigoConfirmacao, novaSenha } = authConfirmarSenhaUsuarioDto
+  async confirmPassword(auth: ConfirmPasswordAuthDto) {
+    const { email, verificationCode, newPassword } = auth
 
-    const userData = {
+    const data = {
       Username: email,
       Pool: this.userPool
     }
 
-    const cognitoUser = new CognitoUser(userData)
+    const user = new CognitoUser(data)
 
     return new Promise((resolve, reject) => {
-      cognitoUser.confirmPassword(codigoConfirmacao, novaSenha, {
+      user.confirmPassword(verificationCode, newPassword, {
         onSuccess: () => {
           resolve({
-            status: 'sucesso'
+            status: 'SUCCESS'
           })
         },
         onFailure: (err) => {
           reject(err)
+        }
+      })
+    })
+  }
+
+  //https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_ListUsers.html
+  async users(email: string): Promise<any> {
+    const params = {
+      UserPoolId: this.USER_POOL_ID,
+      Filter: `email = '${email}'`
+    }
+
+    return new Promise((resolve, reject) => {
+      AWS.config.update({
+        region: this.AWS_S3_REGION,
+        accessKeyId: this.AWS_S3_ACCESS_KEY_ID,
+        secretAccessKey: this.AWS_S3_SECRET_ACCESS_KEY
+      })
+
+      const cognitoIdentityServiceProvider = new AWS.CognitoIdentityServiceProvider()
+
+      cognitoIdentityServiceProvider.listUsers(params, (err, data) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(data)
         }
       })
     })
